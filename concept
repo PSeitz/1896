@@ -1,0 +1,34 @@
+Währung:
+    Coins
+
+Schiffe
+    Größer, Kleiner, Condition
+
+Schiff
+    Kapazität, Crew, Status
+
+Kapazität
+    Weapons or Stuff
+
+Harbor Hints
+    Random Hints, where goods are cheap to buy or expensive to sell
+
+Random Map with Cities
+
+Supply and Demand
+    KI makes move and changes supply and demand
+    Random events change supply and demand
+    Depending on Sourrounding tiletypes
+
+Random Event
+    War
+    Drought
+    Disease
+
+
+Simulation of Creation and Consuming Resources
+    e.g. cities on wood tiles generate wood each turn - the more wood, the cheaper the prices
+
+
+Deep and Shallow Water?
+    Some ships are faster in shallow water
