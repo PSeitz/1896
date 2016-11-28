@@ -76,7 +76,7 @@ function addCanvasStuff(){
 
             let map = new PIXI.Container();
             stage.addChild(map);
-            let world = new WorldMap(null, 350, 350)
+            let world = new WorldMap(null, 15, 15)
             noise.seed(Math.random());
             function drawCells(world){
         		//clear all graphic objects on the stage
@@ -88,10 +88,13 @@ function addCanvasStuff(){
                 let paddingPerSide = 0
         		//iterate all cells in the world
 
-                world.cells.forEach(cell => cell.data.elevation = noise.perlin2(x/50, y/50))
-                world.cells.forEach(cell => cell.data.temperature = noise.perlin2(x/200, y/200))
-                world.cells.forEach(cell => cell.data.rainfall = noise.perlin2(x/20, y/20))
-                world.cells.forEach(cell => cell.data.drainage = noise.perlin2(x/20, y/20))
+                world.cells.forEach(cell => cell.data.elevation = noise.perlin2(cell.x/50, cell.y/50))
+                world.cells.forEach(cell => cell.data.temperature = noise.perlin2(cell.x/200, cell.y/200))
+                world.cells.forEach(cell => cell.data.rainfall = noise.perlin2(cell.x/20, cell.y/20))
+                world.cells.forEach(cell => cell.data.drainage = noise.perlin2(cell.x/20, cell.y/20))
+
+                world.cells.forEach(cell => cell.scale())
+                world.cells.forEach(cell => cell.classify())
 
         		for (var i = 0; i < world.cells.length; i++) {
 
@@ -105,12 +108,10 @@ function addCanvasStuff(){
                     var value = noise.perlin2(x/200, y/200);
                     let type = typeForNum(value)
 
-                    cell.sprite = drawTile(type.color, cellSize - paddingPerSide);
-                    // cell.sprite.anchor.x = 0
-                    // cell.sprite.anchor.y = 0
-                    cell.sprite.position.x = paddingPerSide + x * cellSize;
-                    cell.sprite.position.y = paddingPerSide + y * cellSize;
-                    map.addChild(cell.sprite);
+                    // cell.sprite = drawTile(type.color, cellSize - paddingPerSide);
+                    // cell.sprite.position.x = paddingPerSide + x * cellSize;
+                    // cell.sprite.position.y = paddingPerSide + y * cellSize;
+                    // map.addChild(cell.sprite);
 
         		}
         		// stage.addChild(map);
@@ -135,63 +136,69 @@ function addCanvasStuff(){
 
     const types = {
         "Water": { color:0x2A4F6E},
-        "WarmDesert": { color:0xAA8639, temperature: [30,50]},
-        "TropicalRainForest": { color:0x297B48, temperature: [20,30]},
-        "Savanna": { color:0x297B48, temperature: [20,30]},
-        "Desert": { color:0xAA8639, temperature: [10,20]},
-        "Forest": { color:0x297B48, temperature: [5,20]},
-        "Prairie": { color:0x506630, temperature: [0,10]},
-        "BorealForest": { color:0xDEDEDE,temperature: [-10,0]},
-        "Tundra": { color:0xDEDEDE, temperature:[-20,-10]},
-        "Ice": { color:0xDEDEDE, temperature:[-30,-20]},
+        "Desert": { color:0xAA8639,
+            temperature: [0,30],
+            rainfall: [-1,-0.8]},
+        "TropicalRainForest": { color:0x297B48,
+            temperature: [20,30],
+            rainfall: [0.5,1]},
+        "SubTropicalRainForest": { color:0x297B48,
+            temperature: [20,30],
+            rainfall: [0.0,0.5]},
+        "Savanna": { color:0x297B48,
+            temperature: [20,30],
+            drainage: [-1,1],
+            rainfall: [-0.8,0]},
+        "Forest": { color:0x297B48,
+            temperature: [5,20],
+            drainage: [-1,0.75]},
+        "Wasteland": { color:0x297B48,
+            temperature: [5,20],
+            drainage: [0.75,1],
+            rainfall: [-1,0]},
+        "Swamp": { color:0x506630,
+            temperature: [0,20],
+            rainfall: [0.5,1],
+            drainage: [-1,-0.9]},
+        "Prairie": { color:0x506630,
+            temperature: [0,10],
+            drainage: [0.5,1]},
+        "BorealForest": { color:0xDEDEDE,
+            temperature: [-5,5]},
+        "Tundra": { color:0xDEDEDE,
+            temperature:[-15,-5]}
     };
 
-
-    [30,50]
-    [20,30]
-    [20,30]
-    [10,20]
-    [5,20]
-    [0,10]
-    [-10,0]
-    [-20,-10]
-    [-30,-20]
-
-
-
-
-
-
-
-
-
-    // -30 start
-    let temperatureTypes = [
-        {"WarmDesert":[30,50]},
-        {"TropicalRainForest":[20,30]},
-        {"Savanna":[20,30]},
-        {"Desert":[10,20]},
-        {"Forest":[5,20]},
-        {"Prairie":[0,10]},
-        {"BorealForest":[-10,0]},
-        {"Tundra":[-20,-10]},
-        {"Ice":[-30,-20]}
-    ]
-
-    const classification = {
-        { elevation: [-1, 0],type: "Water"},
-        { elevation: [-1, 0],type: "City",},
-        { elevation: [-1, 0],type: "Wood",},
-        { elevation: [-1, 0],type: "WoodDesert"},
-        { elevation: [-1, 0],type: "Desert",},
-        { elevation: [-1, 0],type: "Ice",}
-    };
+    let typesWithoutWater = Object.assign({}, types);
+    delete typesWithoutWater.Water
+    // const classification = {
+    //     { elevation: [-1, 0],type: "Water"},
+    //     { elevation: [-1, 0],type: "City",},
+    //     { elevation: [-1, 0],type: "Wood",},
+    //     { elevation: [-1, 0],type: "WoodDesert"},
+    //     { elevation: [-1, 0],type: "Desert",},
+    //     { elevation: [-1, 0],type: "Ice",}
+    // };
 
     function typeForNum(num){
         for (var key in typesWithRanges) {
             let type = typesWithRanges[key]
-            if(num >=type.range[0]  && num <= type.range[1]) return type
+            if(inRange(num, type.range)) return type
         }
+    }
+
+    function inRange(num, range) {
+        return num >= range[0] && num <= range[1]
+    }
+
+    function typesToArr(){
+        let arr = []
+        for (var key in types) {
+            let obj = Object.assign({}, types[key]);
+            obj.name = key
+            arr.push(obj)
+        }
+        return arr
     }
 
     class WorldCell {
@@ -203,8 +210,52 @@ function addCanvasStuff(){
         }
         draw(){
         }
-        classify(){
+        scale(){
+            // NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+            console.log(this.data.temperature)
+            let oldRange = 2
+            let newRange = 30 + 15
+            this.data.temperature = (((this.data.temperature + 1) * newRange) / oldRange) - 15
 
+            // this.data.temperature = (((this.data.temperature - (-1))) * (30 - (-15)))) / (1 - (-1)))) + (-15)
+            console.log(this.data.temperature)
+        }
+        classify(){
+            let data = this.data
+            if (data.elevation < 0) {
+                this.type = "Water"
+            }else{
+                let candidates = {}
+                // Check temperature
+                _.each(typesWithoutWater, function(type, key){
+                    if(inRange(data.temperature, type.temperature)) candidates[key] = true
+                })
+
+                _.each(candidates, function(nothing, key){
+                    let type = typesWithoutWater[key]
+                    if (type.rainfall) {
+                        if(!inRange(data.rainfall, type.rainfall)) delete candidates[key]
+                    }
+                })
+
+                _.each(candidates, function(nothing, key){
+                    let type = typesWithoutWater[key]
+                    if (type.drainage) {
+                        if(!inRange(data.drainage, type.drainage)) delete candidates[key]
+                    }
+                })
+                console.log(Object.keys(candidates))
+                // Check drainage
+
+                // Check rainfall
+
+
+                // let candidates = Object.assign({}, types);
+                // delete candidates.Water
+                // let typesArr = typesToArr()
+                // _.remove(typesArr, type => )
+
+            }
         }
     }
 
