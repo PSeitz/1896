@@ -36,6 +36,13 @@ function addPlaneUI(thePlane){
     setXYFrom(thePlane.sprite, thePlane.position)
 }
 
+
+function drawTileRaw(graphics, color, size, x, y){
+    graphics.beginFill(color);
+    graphics.drawRect(x,y, size, size);
+    graphics.endFill();
+}
+
 function drawTile(color, size){
     let graphics = new PIXI.Graphics();
     graphics.beginFill(color);

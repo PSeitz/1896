@@ -30,7 +30,7 @@ class Game {
 }
 
 let game = new Game(0)
-let width = 800;
+let width = 1000;
 let height = 800;
 
 function init() {
@@ -76,7 +76,12 @@ function addCanvasStuff(){
 
             let map = new PIXI.Container();
             stage.addChild(map);
-            let world = new WorldMap(null, 15, 15)
+
+            let mapWidth = 1000
+            let mapHeight = 800
+            let cellSize = 1
+
+            let world = new WorldMap(null, mapWidth, mapHeight)
             noise.seed(Math.random());
             function drawCells(world){
         		//clear all graphic objects on the stage
@@ -84,36 +89,33 @@ function addCanvasStuff(){
         		//set drawing style
         		// map.lineStyle(1, 0x999999);
 
-                let cellSize = 2
+
                 let paddingPerSide = 0
         		//iterate all cells in the world
 
-                world.cells.forEach(cell => cell.data.elevation = noise.perlin2(cell.x/50, cell.y/50))
-                world.cells.forEach(cell => cell.data.temperature = noise.perlin2(cell.x/200, cell.y/200))
-                world.cells.forEach(cell => cell.data.rainfall = noise.perlin2(cell.x/20, cell.y/20))
-                world.cells.forEach(cell => cell.data.drainage = noise.perlin2(cell.x/20, cell.y/20))
+                world.cells.forEach(cell => cell.data.elevation   = noise.simplex2(cell.x * 10/mapWidth, cell.y * 10/mapHeight))
+                world.cells.forEach(cell => cell.data.temperature = noise.simplex2(cell.x/mapWidth, cell.y/mapHeight)) // very slow change
+                world.cells.forEach(cell => cell.data.rainfall    = noise.simplex2(cell.x * 5/mapWidth, cell.y * 5/mapHeight))
+                world.cells.forEach(cell => cell.data.drainage    = noise.simplex2(cell.x/20, cell.y/20))
 
-                world.cells.forEach(cell => cell.scale())
-                world.cells.forEach(cell => cell.classify())
+                // world.cells.forEach(cell => cell.scale())
+                // world.cells.forEach(cell => cell.classify())
 
+                var graphics = new PIXI.Graphics();
+                let simplex =  new SimplexNoise()
         		for (var i = 0; i < world.cells.length; i++) {
-
         			var cell = world.cells[i];
         			var x = cell.x;
         			var y = cell.y;
-
-        			//calculate the position on the canvas where the cell should be drawn
-        			// var drawPosX = paddingPerSide + x + ((x % numberOfCellsPerRow) * (cellSize-1));
-        			// var drawPosY = paddingPerSide + y + ((y % numberOfCellsPerRow) * (cellSize-1));
-                    var value = noise.perlin2(x/200, y/200);
+                    var mod = noise.simplex2(x * 10/mapWidth, y * 10/mapHeight);
+                    var value = noise.simplex3(x* 2/mapWidth, y* 2/mapHeight, mod * y/mapHeight);
+                    // var value = simplex.noise(x/150, y/150);
                     let type = typeForNum(value)
-
-                    // cell.sprite = drawTile(type.color, cellSize - paddingPerSide);
-                    // cell.sprite.position.x = paddingPerSide + x * cellSize;
-                    // cell.sprite.position.y = paddingPerSide + y * cellSize;
-                    // map.addChild(cell.sprite);
+                    drawTileRaw(graphics, type.color, cellSize, paddingPerSide + x * cellSize, paddingPerSide + y * cellSize)
 
         		}
+                stage.addChild(graphics);
+
         		// stage.addChild(map);
         	}
             drawCells(world)
@@ -123,16 +125,7 @@ function addCanvasStuff(){
 
 }
 
-    const typesWithRanges = {
-        "DesertC":  {range: [-1, -0.55], color:0xAA8639},
-        "City1":  {range: [-0.55, -0.5], color:0xCC0000},
-        "Water": {range: [-0.5, 0], color:0x2A4F6E},
-        "City":  {range: [0, .05], color:0xCC0000},
-        "Wood":  {range: [.05, 0.5], color:0x297B48},
-        "WoodDesert":  {range: [.5, 0.55], color:0x506630},
-        "Desert":  {range: [.55, 0.9], color:0xAA8639},
-        "Ice":  {range: [0.9, 1.0], color:0xDEDEDE}
-    };
+
 
     const types = {
         "Water": { color:0x2A4F6E},
@@ -171,14 +164,15 @@ function addCanvasStuff(){
 
     let typesWithoutWater = Object.assign({}, types);
     delete typesWithoutWater.Water
-    // const classification = {
-    //     { elevation: [-1, 0],type: "Water"},
-    //     { elevation: [-1, 0],type: "City",},
-    //     { elevation: [-1, 0],type: "Wood",},
-    //     { elevation: [-1, 0],type: "WoodDesert"},
-    //     { elevation: [-1, 0],type: "Desert",},
-    //     { elevation: [-1, 0],type: "Ice",}
-    // };
+
+    const typesWithRanges = {
+        "Water": {range: [-1, 0], color:0x2A4F6E},
+        "City":  {range: [0, .05], color:0xCC0000},
+        "Wood":  {range: [.05, 0.5], color:0x297B48},
+        "WoodDesert":  {range: [.5, 0.55], color:0x506630},
+        "Desert":  {range: [.55, 0.9], color:0xAA8639},
+        "Ice":  {range: [0.9, 1.0], color:0xDEDEDE}
+    };
 
     function typeForNum(num){
         for (var key in typesWithRanges) {
