@@ -1,7 +1,22 @@
 
-    let typesWithoutWater = Object.assign({}, types);
-    delete typesWithoutWater.Water
-    delete typesWithoutWater.Mountain
+let typesWithoutWater = Object.assign({}, types);
+delete typesWithoutWater.Water
+delete typesWithoutWater.Mountain
+
+
+class Game {
+    constructor(world) {
+        this.world = world;
+        this.day = 0;
+    }
+}
+
+class Player {
+    constructor(money) {
+        this.money = money;
+    }
+}
+
 
 class WorldCell {
     constructor(x, y) {
@@ -16,7 +31,6 @@ class WorldCell {
         let oldRange = 2
         let newRange = 30 + 15
         this.data.temperature = (((this.data.temperature + 1) * newRange) / oldRange) - 15
-        // console.log(this.data.temperature)
     }
     classify(){
         let data = this.data
@@ -25,29 +39,25 @@ class WorldCell {
         }else if (data.elevation > 0.85) {
             this.type = "Mountain"
         }else{
-            let candidates = {}
+
+            let candidates = []
             let self = this
             function checkSet(){
-                if(Object.keys(candidates).length === 1) self.type = Object.keys(candidates)[0]
+                if(candidates.length === 1) self.type = candidates[0]
             }
             // Check temperature
             _.each(typesWithoutWater, function(type, key){
-                if(inRange(data.temperature, type.temperature)) candidates[key] = true
+                if(inRange(data.temperature, type.temperature)) candidates.push(key)//[key] = true
             })
-
-            _.each(candidates, function(nothing, key){
-                checkSet()
-                if (typesWithoutWater[key].rainfall && !inRange(data.rainfall, typesWithoutWater[key].rainfall))
-                    delete candidates[key]
-            })
-
-            _.each(candidates, function(nothing, key){
-                checkSet()
-                if (typesWithoutWater[key].drainage && !inRange(data.drainage, typesWithoutWater[key].drainage)) delete candidates[key]
-            })
-
-            checkSet()
-            if(Object.keys(candidates).length > 1) self.type = Object.keys(candidates)[0]
+            function filter(prop){
+                let cando = candidates.filter(cand => (typesWithoutWater[cand][prop] && !inRange(data[prop], typesWithoutWater[cand][prop])))
+                if (cando.length === 0 && candidates.length > 0) self.type = candidates[0]
+                candidates = cando
+                if(candidates.length === 1) self.type = candidates[0]
+            }
+            filter('rainfall')
+            filter('drainage')
+            if(candidates.length >= 1) self.type = candidates[0]
 
         }
     }
@@ -109,26 +119,21 @@ class SupplyAndDemand {
 }
 
 class City {
-    constructor(name, initialPosition) {
+    constructor(name, cell, population) {
         this.supplyAndDemand = new SupplyAndDemand()
         this.name = name;
-        this.chemtrailTank = 300;
-        this.speed = 1;
-        this.maxSpeed = 2;
-        this.angle = 180;
-        this.position = initialPosition;
-        this.rotationSpeed = 0.5;
-        this.spotted = 0;
+        this.cell = cell;
+        this.population = population;
     }
+    turn(){
+        this.produce()
+        this.consume()
+    }
+    produce(){
 
-    spray(delta, stage){
-        if (this.chemtrailTank <= 0) {
-            return;
-        }
-        let chemTrailAmount =  (1 * delta)
-        this.chemtrailTank -= chemTrailAmount;
-        this.chemtrailTank = Math.max(0, this.chemtrailTank)
-        this.chemtrails.addTrail(this.position, chemTrailAmount, stage)
+    }
+    consume(){
+
     }
 }
 
