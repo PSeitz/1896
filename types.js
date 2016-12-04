@@ -1,10 +1,12 @@
-const types = {
-    "Mountain": { color:0x000000},
-    "Water": { color:0x2A4F6E},
+const cellTypes = {
+    "Mountain": { color:0x101002},
+    // "Water": { color:0x2A4F6E},
+    "ShallowWater": { color:0x165896},
+    "DeepWater": { color:0x002f5b},
     "Desert": { color:0xAA8639,
         temperature: [0,30],
         rainfall: [-1,-0.8]},
-    "TropicalRainForest": { color:0x297B48,
+    "TropicalRainForest": { color:0x26ad2b,
         temperature: [20,30],
         rainfall: [0.5,1]},
     "SubTropicalRainForest": { color:0x7ead80,
@@ -14,7 +16,7 @@ const types = {
         temperature: [20,30],
         drainage: [-1,1],
         rainfall: [-0.8,0]},
-    "Forest": { color:0x6dad2d,
+    "Forest": { color:0x005b03,
         temperature: [5,20],
         drainage: [-1,0.75]},
     "Wasteland": { color:0xada97e,
@@ -28,8 +30,21 @@ const types = {
     "Prairie": { color:0xafaf7b,
         temperature: [0,10],
         drainage: [0.5,1]},
-    "BorealForest": { color:0xD234713,
+    "BorealForest": { color:0x0d300e,
         temperature: [-5,5]},
     "Tundra": { color:0xDEDEDE,
-        temperature:[-15,-5]}
+        temperature:[-10,-5]}
 };
+
+
+let Goods= [
+    "Wood",
+    "Weapons",
+    "Food",
+    "Baumwolle",
+    "Wein",
+    {name: "Coffee", decayPerDay: 5/1000},
+    "Banana",
+    "Gold",
+    "Exotic Animals",
+]

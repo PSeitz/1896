@@ -1,13 +1,22 @@
 
-let typesWithoutWater = Object.assign({}, types);
-delete typesWithoutWater.Water
+let typesWithoutWater = Object.assign({}, cellTypes);
+delete typesWithoutWater.ShallowWater
+delete typesWithoutWater.DeepWater
+// delete typesWithoutWater.Water
 delete typesWithoutWater.Mountain
 
+
+let maxTemperatur = _.maxBy(_.values(cellTypes), el => (el.temperature ? el.temperature[1] : 0)).temperature[1];
+let minTemperatur = _.minBy(_.values(cellTypes), el => (el.temperature ? el.temperature[0] : 0)).temperature[0];
 
 class Game {
     constructor(world) {
         this.world = world;
+        this.cities = [];
         this.day = 0;
+    }
+    turn(){
+
     }
 }
 
@@ -17,7 +26,9 @@ class Player {
     }
 }
 
-
+function scale(val,oldMin, oldMax, newMin, newMax){
+    return (((val - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin
+}
 class WorldCell {
     constructor(x, y) {
         this.x = x;
@@ -28,14 +39,30 @@ class WorldCell {
     }
     scale(){
         // NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-        let oldRange = 2
-        let newRange = 30 + 15
-        this.data.temperature = (((this.data.temperature + 1) * newRange) / oldRange) - 15
+        // let oldRange = 2
+        // let newRange = maxTemperatur - minTemperatur
+
+        let isNegative = this.data.temperature < 0
+
+        // x^(1/sin(0.8)) http://fooplot.com/
+        this.data.temperature = Math.pow(Math.abs(this.data.temperature), 1/Math.sin(0.6))
+        if (isNegative) this.data.temperature *= -1
+
+        // this.data.temperature = (((this.data.temperature + 1) * newRange) / oldRange) + minTemperatur
+        this.data.temperature = scale(this.data.temperature,-1, 1, minTemperatur, maxTemperatur)
+
+        // this.data.temperature = Math.minTemperatur(maxTemperatur, this.data.temperature)
+        // this.data.temperature = Math.maxTemperatur(minTemperatur, this.data.temperature)
     }
     classify(){
         let data = this.data
         if (data.elevation < seaLevel) {
-            this.type = "Water"
+            if (data.elevation + 0.2 < seaLevel) {
+                this.type = "DeepWater"
+            }else{
+                this.type = "ShallowWater"
+            }
+
         }else if (data.elevation > 0.85) {
             this.type = "Mountain"
         }else{
@@ -148,15 +175,3 @@ class Ship {
     move(delta){
     }
 }
-
-let Goods= [
-    "Wood",
-    "Weapons",
-    "Food",
-    "Baumwolle",
-    "Wein",
-    "Weapons",
-    "Weapons",
-    "Weapons",
-    "Weapons",
-]
