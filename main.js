@@ -238,16 +238,16 @@ function drawCanvas(){
 
             var frames = [];
 
-            for (var i = 1; i <= 3; i++) {
+            for (var i = 1; i <= 9; i++) {
 
-                var val = i < 10 ? '0' + i : i;
+                // var val = i < 10 ? '0' + i : i;
 
-                frames.push(PIXI.Texture.fromFrame(baseString + val + '.png'));
+                frames.push(PIXI.Texture.fromFrame(baseString + i + '.png'));
 
             }
 
             var movie = new PIXI.extras.MovieClip(frames);
-            movie.animationSpeed = 0.15
+            movie.animationSpeed = 0.2
             movie.play();
             stage.addChild(movie);
             return movie;
@@ -284,7 +284,7 @@ function addCanvasStuff(){
         .add("ship3", "img/shiplarge_1.jpg")
         .add("shipmap", "img/ship_map.png")
         .add("beer", "img/beer.png")
-        .add('img/beer.json')
+        .add('img/beer/beer.json')
         .load(drawCanvas);
 }
 
