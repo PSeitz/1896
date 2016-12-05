@@ -157,6 +157,20 @@ function rainfallToColor(value){
     let color = '0x'+hex+hex+'FF'
     return color
 }
+
+function setupMovie (baseString){
+
+    var frames = [];
+    let textures = PIXI.loader.resources[baseString].textures
+    for (var i = 0; i < Object.keys(textures).length; i++) {
+        frames.push(textures[baseString+i+'.png']);
+    }
+    var movie = new PIXI.extras.MovieClip(frames);
+    movie.animationSpeed = 0.13
+    movie.play();
+    return movie;
+}
+
 let stage = new PIXI.Container(0x66FF99, true);
 let renderer;
 function drawCanvas(){
@@ -233,27 +247,10 @@ function drawCanvas(){
             // ship1.y = cell.y * cellSize
             // stage.addChild(ship1);
         // })
+        //
 
-        function setupMovie (baseString){
-
-            var frames = [];
-
-            for (var i = 1; i <= 9; i++) {
-
-                // var val = i < 10 ? '0' + i : i;
-
-                frames.push(PIXI.Texture.fromFrame(baseString + i + '.png'));
-
-            }
-
-            var movie = new PIXI.extras.MovieClip(frames);
-            movie.animationSpeed = 0.2
-            movie.play();
-            stage.addChild(movie);
-            return movie;
-        }
-
-        setupMovie('beer')
+        let movie = setupMovie('beer')
+        stage.addChild(movie);
         animate()
 
     }
@@ -283,8 +280,7 @@ function addCanvasStuff(){
         .add("ship2", "img/shipmedium_1.jpg")
         .add("ship3", "img/shiplarge_1.jpg")
         .add("shipmap", "img/ship_map.png")
-        .add("beer", "img/beer.png")
-        .add('img/beer/beer.json')
+        .add('beer','img/beer/beer.json')
         .load(drawCanvas);
 }
 
