@@ -26,17 +26,13 @@ function setPathFindGrid() {
     for (let y = 0; y < mapHeight; y++) {
         grid[y] = new Array(mapWidth);
         for (let x = 0; x < mapWidth; x++) {
-            if (isWater(world.getCellAtXY(x,y).type) || world.getCellAtXY(x,y).isCity) {
-                grid[y][x] = 0
-            }else{
-                grid[y][x] = 1
-            }
+            let isReachable = isWater(world.getCellAtXY(x,y).type) || world.getCellAtXY(x,y).isCity
+            grid[y][x] = isReachable ? 0 : 1
         }
     }
     easystar.setGrid(grid);
     easystar.setAcceptableTiles([0]);
     easystar.enableSync();
-
 }
 
 function isWater(type){
@@ -173,6 +169,23 @@ function setupMovie (baseString){
 
 let stage = new PIXI.Container(0x66FF99, true);
 let renderer;
+
+
+let menu = null
+
+function openCityMenu(city){
+    if (menu) {
+        stage.removeChild(menu)
+    }
+    menu = new PIXI.Container();
+    menu.x = city.cell.x
+    menu.y = city.cell.y
+
+    let movie = setupMovie('beer')
+    menu.addChild(movie);
+
+}
+
 function drawCanvas(){
     let canvas = document.getElementById("stage");
     canvas.width=canvasWidth;
@@ -210,6 +223,10 @@ function drawCanvas(){
             let house = drawHouse('0xBB3333', cellSize*1.5)
             house.x = city.cell.x * cellSize
             house.y = city.cell.y * cellSize
+            house.interactive = true
+            house.click = function(mouseData){
+                openCityMenu(city)
+            }
             stage.addChild(house);
 
             var textOptions = {
@@ -248,9 +265,6 @@ function drawCanvas(){
             // stage.addChild(ship1);
         // })
         //
-
-        let movie = setupMovie('beer')
-        stage.addChild(movie);
         animate()
 
     }
@@ -282,6 +296,15 @@ function addCanvasStuff(){
         .add("shipmap", "img/ship_map.png")
         .add('beer','img/beer/beer.json')
         .load(drawCanvas);
+
+
+    new Vue({
+      el: '#money',
+      data: {
+        money: 'Hello Vue.js!'
+      }
+    })
+
 }
 
 function create2DArray(width, height){

@@ -14,6 +14,8 @@ class Game {
         this.world = world;
         this.cities = [];
         this.day = 0;
+
+        this.player = new Player(3500000)
     }
     turn(){
 
