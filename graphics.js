@@ -42,19 +42,24 @@ function drawTileRaw(graphics, color, size, x, y){
     graphics.drawRect(x,y, size, size);
     graphics.endFill();
 }
+
+
+// function drawHouse(color, size){
+//     let graphics = new PIXI.Graphics();
+//     graphics.beginFill(color);
+//     graphics.drawRoundedRect(x, y, width, height, radius)
+//     graphics.endFill();
+//     return new PIXI.Sprite(graphics.generateCanvasTexture());
+// }
+
 function drawHouse(color, size){
     let graphics = new PIXI.Graphics();
     graphics.beginFill(color);
 
-
-    graphics.drawPolygon([0, size/3, // Starting x, y coordinates for the star
-                      size/2, 0, // Star is drawn in a clockwork motion
-                      size, size/3
-                    ]);
+    graphics.drawPolygon([0, size/3, size/2, 0, size, size/3]);
     graphics.drawRect(0, size/3, size, size);
     graphics.endFill();
     graphics.beginFill(0x333333);
-
     graphics.drawRect(size/3, size*2/3, size/3, size*0.75);
 
     graphics.endFill();
