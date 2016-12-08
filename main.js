@@ -178,11 +178,18 @@ function openCityMenu(city){
         stage.removeChild(menu)
     }
     menu = new PIXI.Container();
-    menu.x = city.cell.x
-    menu.y = city.cell.y
+    menu.x = city.cell.x * cellSize + 20
+    menu.y = city.cell.y * cellSize - 5
+
+    let graphics = new PIXI.Graphics();
+    graphics.beginFill(0x111111, 0.8);
+    graphics.drawRect(0, 0, 128, 32)
+    graphics.endFill();
+    menu.addChild(new PIXI.Sprite(graphics.generateCanvasTexture()));
 
     let movie = setupMovie('beer')
     menu.addChild(movie);
+    stage.addChild(menu)
 
 }
 
@@ -297,12 +304,11 @@ function addCanvasStuff(){
         .add('beer','img/beer/beer.json')
         .load(drawCanvas);
 
-
     new Vue({
-      el: '#money',
-      data: {
-        money: 'Hello Vue.js!'
-      }
+        el: '#money',
+        data: {
+            money: 'Hello Vue.js!'
+        }
     })
 
 }
