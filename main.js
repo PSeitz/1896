@@ -131,6 +131,12 @@ function generateWorld(world){
 
     console.timeEnd("groupCities")
 
+
+    // Add Ship
+    let startCell = _.sample(cityCells)
+    let playerShip = new Ship(faker.commerce.productName(), 100, 35, startCell, game.player)
+    game.ships.push(playerShip)
+
 }
 
 let sprites = {
@@ -253,6 +259,19 @@ function drawCanvas(){
             text.y = city.cell.y * cellSize - 5
             text.canvas.style.webkitFontSmoothing = "antialiased";
             stage.addChild(text);
+        })
+
+
+        game.ships.forEach(ship => {
+            var ship1texture = PIXI.loader.resources.shipmap.texture;
+            var ship1 = new PIXI.Sprite(ship1texture);
+            ship1.interactive = true;
+            ship1.click = function(mouseData){
+               alert("CLICK!");
+            }
+            ship1.x = ship.position.x * cellSize
+            ship1.y = ship.position.y * cellSize
+            stage.addChild(ship1);
         })
 
         // world.cells.filter(cell => cell.isCity).forEach(cell => {

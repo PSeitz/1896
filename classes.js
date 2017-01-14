@@ -16,6 +16,7 @@ class Game {
         this.day = 0;
 
         this.player = new Player(3500000)
+        this.ships = []
     }
     turn(){
 
@@ -168,11 +169,12 @@ class City {
 
 
 class Ship {
-    constructor(name, condition, capacity, position) {
+    constructor(name, condition, capacity, position, owner) {
         this.name = name;
         this.condition = condition;
         this.capacity = capacity;
         this.position = position
+        this.owner = owner
     }
     move(delta){
     }
