@@ -55,12 +55,12 @@ function drawTileRaw(graphics, color, size, x, y){
 function drawHouse(color, size){
     let graphics = new PIXI.Graphics();
     graphics.beginFill(color);
-
-    graphics.drawPolygon([0, size/3, size/2, 0, size, size/3]);
-    graphics.drawRect(0, size/3, size, size);
+    let size3 = Math.round(size/3)
+    graphics.drawPolygon([0, size3, size/2, 0, size, size3]);
+    graphics.drawRect(0, size3, size, size);
     graphics.endFill();
     graphics.beginFill(0x333333);
-    graphics.drawRect(size/3, size*2/3, size/3, size*0.75);
+    graphics.drawRect(size3, Math.round(size*2/3), size3, Math.round(size*0.75));
 
     graphics.endFill();
 

@@ -112,11 +112,12 @@ class WorldMap {
     draw(){
 
     }
-    getNeighborsWithCell(cell){return this.getNeighbors(cell.x, cell.y)}
-    getNeighbors(x,y){
+    getNeighborsWithCell(cell, radius){return this.getNeighbors(cell.x, cell.y, radius)}
+    getNeighbors(x,y, radius){
+        radius = radius || 1
         let neighbors = []
-        for (let rowNum=Math.max(x-1, 0); rowNum<=Math.min(x+1, this.width-1); rowNum++) {
-            for (let colNum=Math.max(y-1, 0); colNum<=Math.min(y+1, this.height-1); colNum++) {
+        for (let rowNum=Math.max(x-radius, 0); rowNum<=Math.min(x+radius, this.width-1); rowNum++) {
+            for (let colNum=Math.max(y-radius, 0); colNum<=Math.min(y+radius, this.height-1); colNum++) {
                 if (rowNum == x && colNum == y) continue;
                 neighbors.push(this.getCellAtXY(rowNum,colNum))
                 // All the neighbors will be grid[rowNum][colNum]
@@ -140,16 +141,29 @@ function getDistance( point1, point2 )
     return Math.hypot(point2.x-point1.x, point2.y-point1.y)
 }
 
-class SupplyAndDemand {
-    constructor(supply, demand) {
-        this.supply = supply;
-        this.position = demand;
-    }
 
+class SupplyAndDemand {
+    constructor(producingGoods, neededGoods, population) {
+        // this.supply = supply;
+        // this.demand = demand;
+    }
+}
+
+class InfluenceArea{
+    constructor(cell, world) {
+        this.nearNeighbors = world.getNeighborsWithCell(cell, 3)
+    }
+    getNeighborsWithTypes(types){
+        return this.nearNeighbors.filter(cell => types.indexOf(cell.type))
+    }
+    getWoodCells(){
+        return this.getNeighborsWithTypes(["BorealForest", "TropicalRainForest", "Forest"]).length
+    }
 }
 
 class City {
-    constructor(name, cell, population) {
+    constructor(name, cell, population, world) {
+        this.InfluenceArea = new InfluenceArea(cell, world)
         this.supplyAndDemand = new SupplyAndDemand()
         this.name = name;
         this.cell = cell;

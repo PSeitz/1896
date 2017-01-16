@@ -126,7 +126,7 @@ function generateWorld(world){
 
     let cityCells = world.cells.filter(cell => cell.isCity)
     cityCells.forEach(cell => {
-        game.cities.push(new City(faker.address.city(), cell, 10))
+        game.cities.push(new City(faker.address.city(), cell, 10, world))
     })
 
     console.timeEnd("groupCities")
@@ -179,13 +179,23 @@ let renderer;
 
 let menu = null
 
+function closeCityMenu(city){
+    stage.removeChild(menu)
+}
+
 function openCityMenu(city){
+    let xPos = city.cell.x * cellSize + 20
+    let yPos = city.cell.y * cellSize - 5
     if (menu) {
         stage.removeChild(menu)
+        if (menu.x == xPos && menu.y == yPos) { // same menu
+            menu = null
+            return
+        }
     }
     menu = new PIXI.Container();
-    menu.x = city.cell.x * cellSize + 20
-    menu.y = city.cell.y * cellSize - 5
+    menu.x = xPos
+    menu.y = yPos
 
     let graphics = new PIXI.Graphics();
     graphics.beginFill(0x111111, 0.8);
@@ -233,13 +243,11 @@ function drawCanvas(){
         stage.addChild(sprites.container);
 
         game.cities.forEach(city => {
-            let house = drawHouse('0xBB3333', cellSize*1.5)
+            let house = drawHouse('0xBB3333', Math.round(cellSize*1.5))
             house.x = city.cell.x * cellSize
             house.y = city.cell.y * cellSize
             house.interactive = true
-            house.click = function(mouseData){
-                openCityMenu(city)
-            }
+            house.click = (mouseData) => openCityMenu(city)
             stage.addChild(house);
 
             var textOptions = {

@@ -37,14 +37,14 @@ const cellTypes = {
 };
 
 
-let Goods= [
-    "Wood",
-    "Weapons",
-    "Food",
-    "Baumwolle",
-    "Wein",
-    {name: "Coffee", decayPerDay: 5/1000},
-    "Banana",
-    "Gold",
-    "Exotic Animals",
-]
+let Goods= {
+    "Wood":{decayPerDay: 1/1000},
+    "Weapons":{},
+    "Food":{decayPerDay: 5/1000},
+    "Baumwolle":{decayPerDay: 1/1000},
+    "Wein":{},
+    "Coffee":{decayPerDay: 5/1000},
+    "Banana":{},
+    "Gold":{},
+    "Exotic Animals":{},
+}
