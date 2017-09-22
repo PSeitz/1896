@@ -198,10 +198,7 @@ function openCityMenu(city){
     menu.y = yPos
 
     let graphics = new PIXI.Graphics();
-    graphics.beginFill(0x111111, 0.8);
-    graphics.drawRect(0, 0, 128, 32)
-    graphics.endFill();
-    menu.addChild(new PIXI.Sprite(graphics.generateCanvasTexture()));
+    drawCityMenu(graphics, menu)
 
     let movie = setupMovie('beer')
     menu.addChild(movie);

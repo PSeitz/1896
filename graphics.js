@@ -43,6 +43,13 @@ function drawTileRaw(graphics, color, size, x, y){
     graphics.endFill();
 }
 
+function drawCityMenu(graphics, menu) {
+    let graphics = new PIXI.Graphics();
+    graphics.beginFill(0x3d321a, 0.99);
+    graphics.drawRoundedRect(0, 0, 128, 32, 3)
+    graphics.endFill();
+    menu.addChild(new PIXI.Sprite(graphics.generateCanvasTexture()));
+}
 
 // function drawHouse(color, size){
 //     let graphics = new PIXI.Graphics();
