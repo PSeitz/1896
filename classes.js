@@ -57,7 +57,7 @@ class WorldCell {
         // this.data.temperature = Math.minTemperatur(maxTemperatur, this.data.temperature)
         // this.data.temperature = Math.maxTemperatur(minTemperatur, this.data.temperature)
     }
-    classify(){
+    classify(seaLevel){
         let data = this.data
         if (data.elevation < seaLevel) {
             if (data.elevation + 0.2 < seaLevel) {
@@ -94,10 +94,11 @@ class WorldCell {
 }
 
 class WorldMap {
-    constructor(cities, width, height) {
+    constructor(cities, width, height, seaLevel) {
         this.cities = cities;
         this.width = width
         this.height = height
+        this.seaLevel = seaLevel
         this.cells = []
         this.createCells(width, height)
     }
