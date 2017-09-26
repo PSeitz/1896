@@ -1,16 +1,26 @@
 
 
-
 let canvasWidth = 1500;
 let canvasHeight = 800;
 let mapWidth = 150
 let mapHeight = 80
 let cellSize = 10
-var easystar = new EasyStar.js();
+export const easystar = new EasyStar.js();
 
-let game = new Game(new WorldMap(null, mapWidth, mapHeight))
 
-generateWorld({world:game.world, seaLevel: 0.2})
+
+import {Game, WorldMap, minTemperatur, maxTemperatur} from "./classes.js"
+import * as util from './util.js'
+import * as helper from './helper.js'
+import {cellTypes} from './types.js'
+
+import {drawTileRaw, drawHouse, drawCityMenu} from './graphics.js'
+
+let game = new Game(new WorldMap(mapWidth, mapHeight))
+
+import {generateWorld} from "./generate_world.js"
+
+generateWorld({world:game.world, seaLevel: 0.2, mapWidth:mapWidth, mapHeight:mapHeight, canvasWidth:canvasWidth, canvasHeight:canvasHeight, player: game.player})
 
 if (localStorage['savegame1']) {
     console.time("loadGame")
@@ -19,7 +29,7 @@ if (localStorage['savegame1']) {
     console.timeEnd("loadGame")
 }else{
     console.time("generateWorld")
-    generateWorld({world:game.world, seaLevel: 0.2})
+    generateWorld({world:game.world, seaLevel: 0.2, mapWidth:mapWidth, mapHeight:mapHeight, canvasWidth:canvasWidth, canvasHeight:canvasHeight, player: game.player})
     console.timeEnd("generateWorld")
     localStorage['savegame1'] = JSON.stringify(game)
 }
@@ -35,26 +45,23 @@ window.onload = function(){
 // game = JSON.parse(localStorage['savegame1'])
 // world = game.world
 
-function isWater(type){
-    return type == "ShallowWater" || type == "DeepWater" || type == "Water"
-}
 
 let sprites = {
 
 }
 
 function temperatureToColor(value){
-    let val = Math.round(scale(value,minTemperatur, maxTemperatur, -255, 0)) * -1
+    let val = Math.round(util.scale(value,minTemperatur, maxTemperatur, -255, 0)) * -1
     let hex = val.toString(16)
     return '0xFF'+hex+hex
 }
 function elevationToColor(value){
-    let val = scale(value,-1, 1, -255, 0)
+    let val = util.scale(value,-1, 1, -255, 0)
     let hex = Math.round(val*-1).toString(16)
     return '0x'+hex+hex+hex
 }
 function rainfallToColor(value){
-    let val = Math.round(scale(value, -1 ,1 , -255, 0)) * -1
+    let val = Math.round(util.scale(value, -1 ,1 , -255, 0)) * -1
     let hex = val.toString(16)
     let color = '0x'+hex+hex+'FF'
     return color
@@ -142,7 +149,7 @@ function drawCanvas(){
         sprites.container.addChild(sprites.worldView);
         stage.addChild(sprites.container);
 
-        game.cities.forEach(city => {
+        world.cities.forEach(city => {
             let house = drawHouse('0xBB3333', Math.round(cellSize*1.5))
             house.x = city.cell.x * cellSize
             house.y = city.cell.y * cellSize
@@ -160,7 +167,7 @@ function drawCanvas(){
                 lineJoin: 'round' // Set the lineJoin to round instead of 'miter'
             }
             let text = new PIXI.Text(city.name ,textOptions);
-            setXY(text.anchor, 0.5);
+            helper.setXY(text.anchor, 0.5);
             text.x = city.cell.x * cellSize + 5
             if (text.x <= 40) text.anchor.x = .1
             if (text.x >= canvasWidth - 40) text.anchor.x = .9
@@ -170,7 +177,7 @@ function drawCanvas(){
         })
 
 
-        game.ships.forEach(ship => {
+        world.ships.forEach(ship => {
             var ship1texture = PIXI.loader.resources.shipmap.texture;
             var ship1 = new PIXI.Sprite(ship1texture);
             ship1.interactive = true;
@@ -246,9 +253,4 @@ function create2DArray(width, height){
         x[i] = new Array(width);
     }
     return x
-}
-
-
-function inRange(num, range) {
-    return num >= range[0] && num <= range[1]
 }

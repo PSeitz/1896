@@ -1,19 +1,17 @@
 Währung:
     Coins
 
+Schiffe
+    Größer, Kleiner, Condition
 
 Schiff
-    Kapazität, 
-    - Crew: Gute Crew, teurer und Schneller
-    - Condition:
-        Muscheln am Rumpf verlangsamen das Schiff, dadurch wird jeder transport ineffizienter
+    Kapazität, Crew, Status
 
 Kapazität
     Weapons or Stuff
 
 Harbor Hints
     Random Hints, where goods are cheap to buy or expensive to sell
-    When a competitor will arrive with goods x in city y
 
 Random Map with Cities
 
@@ -34,6 +32,3 @@ Simulation of Creation and Consuming Resources
 
 Deep and Shallow Water?
     Some ships are faster in shallow water
-
-
-

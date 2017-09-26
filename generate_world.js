@@ -1,26 +1,37 @@
 
+import {getDistance} from './util.js'
+import {easystar} from './main.js'
 
+import {City, Ship} from "./classes.js"
 
-function generateWorld(opt){
+function isWater(type){
+    return type == "ShallowWater" || type == "DeepWater" || type == "Water"
+}
+
+export function generateWorld(opt){
     let world = opt.world
     let seaLevel = opt.seaLevel
     // noise.seed(16);
     // noise.seed(Math.random());
     console.time("cells")
     world.cells.forEach(cell => {
-        // cell.data.elevation   = noise.simplex2(cell.x * 10/mapWidth, cell.y * 10/mapHeight)
-        var mod = noise.simplex2(cell.x * 10/mapWidth, cell.y * 10/mapHeight);
-        var value = noise.simplex3(cell.x* 2/mapWidth, cell.y* 2/mapHeight, mod * cell.y/(mapHeight*5));
+        // cell.data.elevation   = noise.simplex2(cell.x * 10/opt.mapWidth, cell.y * 10/opt.mapHeight)
+        var mod = noise.simplex2(cell.x * 10/opt.mapWidth, cell.y * 10/opt.mapHeight);
+        var value = noise.simplex3(cell.x* 2/opt.mapWidth, cell.y* 2/opt.mapHeight, mod * cell.y/(opt.mapHeight*5));
         cell.data.elevation = value
     })
 
-    world.cells.forEach(cell => cell.data.temperature = noise.simplex2(cell.x/mapWidth, cell.y/mapHeight)) // very slow change
-    world.cells.forEach(cell => cell.data.rainfall    = noise.simplex2(cell.x * 2/mapWidth, cell.y * 2/mapHeight))
+    world.cells.forEach(cell => cell.data.temperature = noise.simplex2(cell.x/opt.mapWidth, cell.y/opt.mapHeight)) // very slow change
+    world.cells.forEach(cell => cell.data.rainfall    = noise.simplex2(cell.x * 2/opt.mapWidth, cell.y * 2/opt.mapHeight))
     world.cells.forEach(cell => cell.data.drainage    = noise.simplex2(cell.x/20, cell.y/20))
 
     world.cells.forEach(cell => cell.scale())
     world.cells.forEach(cell => cell.classify(seaLevel))
     console.timeEnd("cells")
+
+    function inRange(num, range) {
+        return num >= range[0] && num <= range[1]
+    }
 
     function placeHouse(){
         let shoreCells = world.cells.filter(cell => {
@@ -37,7 +48,7 @@ function generateWorld(opt){
             let cell = _.sample(shoreCells)
             cell.isCity=true
             // shoreCells = shoreCells.filter(cell5 => getDistance(cell5, cell)>5)
-            let minDistance = canvasWidth * canvasHeight  /100000
+            let minDistance = opt.canvasWidth * opt.canvasHeight  /100000
             shoreCells.filter(cell5 => (getDistance(cell5, cell)<minDistance && cell5 !=cell)).forEach(cell => (cell.isCity = false))
         }
 
@@ -75,7 +86,7 @@ function generateWorld(opt){
             }
         })
     }
-    let maxCities = canvasWidth * canvasHeight / 50000
+    let maxCities = opt.canvasWidth * opt.canvasHeight / 50000
     function limitNumCities(){
         while (world.cells.filter(cell => cell.isCity).length > maxCities) {
             _.sample(world.cells.filter(cell => cell.isCity)).isCity = false
@@ -85,10 +96,10 @@ function generateWorld(opt){
     console.time("groupCities")
 
     function setPathFindGrid() {
-        var grid = new Array(mapHeight);
-        for (let y = 0; y < mapHeight; y++) {
-            grid[y] = new Array(mapWidth);
-            for (let x = 0; x < mapWidth; x++) {
+        var grid = new Array(opt.mapHeight);
+        for (let y = 0; y < opt.mapHeight; y++) {
+            grid[y] = new Array(opt.mapWidth);
+            for (let x = 0; x < opt.mapWidth; x++) {
                 let isReachable = isWater(world.getCellAtXY(x,y).type) || world.getCellAtXY(x,y).isCity
                 grid[y][x] = isReachable ? 0 : 1
             }
@@ -105,7 +116,7 @@ function generateWorld(opt){
 
     let cityCells = world.cells.filter(cell => cell.isCity)
     cityCells.forEach(cell => {
-        game.cities.push(new City(faker.address.city(), cell, 10, world))
+        world.cities.push(new City(faker.address.city(), cell, 10, world))
     })
 
     console.timeEnd("groupCities")
@@ -113,7 +124,7 @@ function generateWorld(opt){
 
     // Add Ship
     let startCell = _.sample(cityCells)
-    let playerShip = new Ship(faker.commerce.productName(), 100, 35, startCell, game.player)
-    game.ships.push(playerShip)
+    let playerShip = new Ship(faker.commerce.productName(), 100, 35, startCell, opt.player)
+    world.ships.push(playerShip)
 
 }

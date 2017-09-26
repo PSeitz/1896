@@ -1,4 +1,4 @@
-const cellTypes = {
+export const cellTypes = {
     "Mountain": { color:0x101002},
     // "Water": { color:0x2A4F6E},
     "ShallowWater": { color:0x165896},

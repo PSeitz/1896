@@ -1,4 +1,7 @@
 
+import {cellTypes} from './types.js'
+import {inRange,scale} from './util.js'
+
 let typesWithoutWater = Object.assign({}, cellTypes);
 delete typesWithoutWater.ShallowWater
 delete typesWithoutWater.DeepWater
@@ -6,10 +9,10 @@ delete typesWithoutWater.DeepWater
 delete typesWithoutWater.Mountain
 
 
-let maxTemperatur = _.maxBy(_.values(cellTypes), el => (el.temperature ? el.temperature[1] : 0)).temperature[1];
-let minTemperatur = _.minBy(_.values(cellTypes), el => (el.temperature ? el.temperature[0] : 0)).temperature[0];
+export let maxTemperatur = _.maxBy(_.values(cellTypes), el => (el.temperature ? el.temperature[1] : 0)).temperature[1];
+export let minTemperatur = _.minBy(_.values(cellTypes), el => (el.temperature ? el.temperature[0] : 0)).temperature[0];
 
-class Game {
+export class Game {
     constructor(world) {
         this.world = world;
         this.cities = [];
@@ -29,9 +32,7 @@ class Player {
     }
 }
 
-function scale(val,oldMin, oldMax, newMin, newMax){
-    return (((val - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin
-}
+
 class WorldCell {
     constructor(x, y) {
         this.x = x;
@@ -93,9 +94,10 @@ class WorldCell {
     }
 }
 
-class WorldMap {
-    constructor(cities, width, height, seaLevel) {
-        this.cities = cities;
+export class WorldMap {
+    constructor(width, height, seaLevel) {
+        this.cities = [];
+        this.ships = [];
         this.width = width
         this.height = height
         this.seaLevel = seaLevel
@@ -137,10 +139,6 @@ class WorldMap {
     }
 }
 
-function getDistance( point1, point2 )
-{
-    return Math.hypot(point2.x-point1.x, point2.y-point1.y)
-}
 
 
 class SupplyAndDemand {
@@ -162,7 +160,7 @@ class InfluenceArea{
     }
 }
 
-class City {
+export class City {
     constructor(name, cell, population, world) {
         this.InfluenceArea = new InfluenceArea(cell, world)
         this.supplyAndDemand = new SupplyAndDemand()
@@ -183,7 +181,7 @@ class City {
 }
 
 
-class Ship {
+export class Ship {
     constructor(name, condition, capacity, position, owner) {
         this.name = name;
         this.condition = condition;

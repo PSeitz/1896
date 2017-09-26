@@ -1,4 +1,4 @@
-function addPersonUI(person, stage) {
+export function addPersonUI(person, stage) {
 
     let container = new PIXI.DisplayObjectContainer();
     person.container = container;
@@ -23,7 +23,7 @@ function addPersonUI(person, stage) {
     person.text.y = - 20 - _.random(0, 80);
 }
 
-function addPlaneUI(thePlane){
+export function addPlaneUI(thePlane){
     let planerDrawer = new PIXI.Graphics();
     planerDrawer.beginFill(thePlane.color);
     planerDrawer.drawRect(0,0, 35, 15);
@@ -37,20 +37,20 @@ function addPlaneUI(thePlane){
 }
 
 
-function drawTileRaw(graphics, color, size, x, y){
+export function drawTileRaw(graphics, color, size, x, y){
     graphics.beginFill(color);
     graphics.drawRect(x,y, size, size);
     graphics.endFill();
 }
 
-function drawCityMenu(graphics, menu) {
+export function drawCityMenu(graphics, menu) {
     graphics.beginFill(0x3d321a, 0.99);
     graphics.drawRoundedRect(0, 0, 128, 32, 3)
     graphics.endFill();
     menu.addChild(new PIXI.Sprite(graphics.generateCanvasTexture()));
 }
 
-// function drawHouse(color, size){
+// export function drawHouse(color, size){
 //     let graphics = new PIXI.Graphics();
 //     graphics.beginFill(color);
 //     graphics.drawRoundedRect(x, y, width, height, radius)
@@ -58,7 +58,7 @@ function drawCityMenu(graphics, menu) {
 //     return new PIXI.Sprite(graphics.generateCanvasTexture());
 // }
 
-function drawHouse(color, size){
+export function drawHouse(color, size){
     let graphics = new PIXI.Graphics();
     graphics.beginFill(color);
     let size3 = Math.round(size/3)
@@ -72,7 +72,7 @@ function drawHouse(color, size){
 
     return new PIXI.Sprite(graphics.generateCanvasTexture());
 }
-function drawTile(color, size){
+export function drawTile(color, size){
     let graphics = new PIXI.Graphics();
     graphics.beginFill(color);
     graphics.drawRect(0,0, size, size);
@@ -80,7 +80,7 @@ function drawTile(color, size){
     return new PIXI.Sprite(graphics.generateCanvasTexture());
 }
 
-function drawPerson(graphics, color, position){
+export function drawPerson(graphics, color, position){
     graphics.beginFill(color);
     graphics.drawRect(0,0, 7, 30);
     graphics.endFill();
