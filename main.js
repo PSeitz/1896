@@ -14,7 +14,7 @@ import * as util from './util.js'
 import * as helper from './helper.js'
 import {cellTypes} from './types.js'
 
-import {drawTileRaw, drawHouse, drawCityMenu} from './graphics.js'
+import * as g from './graphics.js'
 
 let game = new Game(new WorldMap(mapWidth, mapHeight))
 
@@ -107,13 +107,108 @@ function openCityMenu(city){
     menu.y = yPos
 
     let graphics = new PIXI.Graphics();
-    drawCityMenu(graphics, menu)
+    g.drawCityMenu(graphics, menu)
 
     let movie = setupMovie('beer')
     movie.click = (mouseData) => alert("CLICK Beer");
     menu.addChild(movie);
     stage.addChild(menu)
 
+}
+
+let shipMenu = null
+function openShipMenu(ship){
+    let xPos = ship.position.x * cellSize + 20
+    let yPos = ship.position.y * cellSize - 5
+    if (shipMenu) {
+        stage.removeChild(shipMenu)
+        if (shipMenu.x == xPos && shipMenu.y == yPos) { // same shipMenu, don't draw new menu
+            shipMenu = null
+            return
+        }
+    }
+    shipMenu = new PIXI.Container();
+    shipMenu.x = xPos
+    shipMenu.y = yPos
+
+    let graphics = new PIXI.Graphics();
+    g.drawCityMenu(graphics, shipMenu)
+
+    let text = newText("Drive")
+    text.interactive = true;
+    text.click = (mouseData) => showNavigation(world);
+    text.y = 5, text.x = 5
+    shipMenu.addChild(text);
+    stage.addChild(shipMenu)
+
+}
+
+let navigationLayer = null
+
+function showNavigation(world) {
+    navigationLayer = new PIXI.Container();
+    var myGraph = new PIXI.Graphics();
+
+    var dashed = new PIXI.Graphics();
+    g.drawdash(0,0,cellSize*2,0,3, dashed);
+    g.drawdash(0,0,0,cellSize*2,3, dashed);
+    g.drawdash(cellSize*2,0,cellSize*2,cellSize*2,3, dashed);
+    g.drawdash(0,cellSize*2,cellSize*2,cellSize*2,3, dashed);
+    let texture = renderer.generateTexture( graphic);
+
+    console.time("cities")
+    world.cities.forEach(city => {
+        let x = city.cell.x * cellSize - cellSize / 2
+        let y = city.cell.y * cellSize - cellSize / 4
+
+        let step = cellSize*2.5
+
+        let line = myGraph.lineStyle(2, 0x338686)
+        .moveTo(x, y)
+        .lineTo(x+step, y)
+        .lineTo(x+step, y+step)
+        .lineTo(x, y+step)
+        .lineTo(x, y)
+ 
+        navigationLayer.addChild(line)
+
+        // var thing = new PIXI.Graphics();
+        // navigationLayer.addChild(thing);
+        // thing.position.x = x;
+        // thing.position.y = y;
+        // thing.lineStyle(0);
+        // thing.beginFill(0x8bc5ff, 0.4);
+        // thing.drawRect(0,0, cellSize, cellSize);
+        // thing.endFill();
+        // line.mask = thing;
+        // navigationLayer.addChild(g.drawdash(x,y,x+cellSize*2,y,3, myGraph));
+        // navigationLayer.addChild(g.drawdash(x,y,x,y+cellSize*2,3, myGraph));
+        // navigationLayer.addChild(g.drawdash(x+cellSize*2,y,x+cellSize*2,y+cellSize*2,3, myGraph));
+        // navigationLayer.addChild(g.drawdash(x,y+cellSize*2,x+cellSize*2,y+cellSize*2,3, myGraph));
+
+
+    })
+    console.timeEnd("cities")
+
+    stage.addChild(navigationLayer)
+    // let line = g.drawdash(50,50,650,50,1);
+    // stage.addChild(line);
+}
+
+function newText(val) { // For prototyping ?
+    var textOptions = {
+        fontFamily: 'Arial', // Set style, size and font
+        fontSize: '14px',
+        fill: 'white', // Set fill color to blue
+        align: 'center', // Center align the text, since it's multiline
+        stroke: '#34495e', // Set stroke color to a dark blue-gray color
+        strokeThickness: 3, // Set stroke thickness to 20
+        lineJoin: 'round' // Set the lineJoin to round instead of 'miter'
+    }
+    let text = new PIXI.Text(val ,textOptions);
+    // helper.setXY(text.anchor, 0.5);
+    text.canvas.style.webkitFontSmoothing = "antialiased";
+    return text
 }
 
 function drawCanvas(){
@@ -140,17 +235,17 @@ function drawCanvas(){
             let x = paddingPerSide + cell.x * cellSize
             let y = paddingPerSide + cell.y * cellSize
             let type = cellTypes[cell.type]
-            drawTileRaw(sprites.worldView, type.color, cellSize, x, y)
-            drawTileRaw(sprites.temperatureView, temperatureToColor(cell.data.temperature), cellSize, x, y)
-            drawTileRaw(sprites.elevationView, elevationToColor(cell.data.elevation), cellSize, x, y)
-            drawTileRaw(sprites.rainFallView, rainfallToColor(cell.data.rainfall), cellSize, x, y)
+            g.drawTileRaw(sprites.worldView, type.color, cellSize, x, y)
+            g.drawTileRaw(sprites.temperatureView, temperatureToColor(cell.data.temperature), cellSize, x, y)
+            g.drawTileRaw(sprites.elevationView, elevationToColor(cell.data.elevation), cellSize, x, y)
+            g.drawTileRaw(sprites.rainFallView, rainfallToColor(cell.data.rainfall), cellSize, x, y)
 
         }
         sprites.container.addChild(sprites.worldView);
         stage.addChild(sprites.container);
 
         world.cities.forEach(city => {
-            let house = drawHouse('0xBB3333', Math.round(cellSize*1.5))
+            let house = g.drawHouse('0xBB3333', Math.round(cellSize*1.5))
             house.x = city.cell.x * cellSize
             house.y = city.cell.y * cellSize
             house.interactive = true
@@ -182,7 +277,7 @@ function drawCanvas(){
             var ship1 = new PIXI.Sprite(ship1texture);
             ship1.interactive = true;
             ship1.click = function(mouseData){
-                alert("CLICK Ship!");
+                openShipMenu(ship);
             }
             ship1.x = ship.position.x * cellSize
             ship1.y = ship.position.y * cellSize
@@ -190,7 +285,7 @@ function drawCanvas(){
         })
 
         // world.cells.filter(cell => cell.isCity).forEach(cell => {
-            // let house = drawHouse('0xBB3333', cellSize*1.5)
+            // let house = g.drawHouse('0xBB3333', cellSize*1.5)
             // house.x = cell.x * cellSize
             // house.y = cell.y * cellSize
             // stage.addChild(house);
@@ -229,6 +324,12 @@ function showTemperature() { andNowDraw(sprites.temperatureView)}
 function showMap() {andNowDraw(sprites.worldView)}
 function showElevation() { andNowDraw(sprites.elevationView) }
 function showRainFall() { andNowDraw(sprites.rainFallView) }
+
+window.showTemperature = showTemperature
+window.showMap = showMap
+window.showElevation = showElevation
+window.showRainFall = showRainFall
+
 function loadImagesAndDraw(){
     let loader = PIXI.loader
     loader.add("ship1", "img/shipsmall_1.jpg")
