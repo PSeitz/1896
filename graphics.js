@@ -1,27 +1,7 @@
-export function addPersonUI(person, stage) {
 
-    let container = new PIXI.DisplayObjectContainer();
-    person.container = container;
-    stage.addChild(container);
+import * as PIXI from 'pixi.js';
+import * as helper from './helper.js'
 
-    let graphics = new PIXI.Graphics();
-    drawPerson(graphics, person.color, person.position);
-
-    let texture = graphics.generateTexture();
-    person.sprite = new PIXI.Sprite(texture);
-    person.sprite.interactive = false;
-
-    setXY(person.sprite.anchor, 0.5);
-    container.addChild(person.sprite);
-
-    setXYFrom(person.container, person.position)
-
-    person.text = new PIXI.cocoontext.CocoonText(person.name ,{font : '10px Arial', align : 'center', fill:"white"});
-    setXY(person.text.anchor, 0.5);
-    person.text.canvas.style.webkitFontSmoothing = "antialiased";
-    container.addChild(person.text);
-    person.text.y = - 20 - _.random(0, 80);
-}
 
 export function addPlaneUI(thePlane){
     let planerDrawer = new PIXI.Graphics();
@@ -31,9 +11,9 @@ export function addPlaneUI(thePlane){
 
     let texture = planerDrawer.generateTexture();
     thePlane.sprite = new PIXI.Sprite(texture)
-    setXY(thePlane.sprite.anchor, 0.5);
+    helper.setXY(thePlane.sprite.anchor, 0.5);
     thePlane.sprite.anchor.x=0.3
-    setXYFrom(thePlane.sprite, thePlane.position)
+    helper.setXYFrom(thePlane.sprite, thePlane.position)
 }
 
 
@@ -87,8 +67,8 @@ export function drawPerson(graphics, color, position){
 }
 
 
-export function drawdash(x0,y0,x1,y1,linewidth, dashed){
-    
+export function drawdash(x0,y0,x1,y1,linewidth){
+    let dashed = new PIXI.Graphics()
     dashed.lineStyle(1, 0x59e3e8, 1); // linewidth,color,alpha
     dashed.moveTo(0, 0);
     dashed.lineTo(linewidth,0);
@@ -103,46 +83,46 @@ export function drawdash(x0,y0,x1,y1,linewidth, dashed){
     tilingSprite.pivot.set(linewidth/2, linewidth/2);
     return tilingSprite;
     function angle(x0,y0,x1,y1){
-            var diff_x = Math.abs(x1 - x0),
-                diff_y = Math.abs(y1 - y0);
-            var cita;
-           if(x1>x0){
+        var diff_x = Math.abs(x1 - x0),
+            diff_y = Math.abs(y1 - y0);
+        var cita;
+        if(x1>x0){
+            if(y1>y0){
+                cita= 360*Math.atan(diff_y/diff_x)/(2*Math.PI);
+            }else
+            {
+                if(y1<y0){
+                    cita=-360*Math.atan(diff_y/diff_x)/(2*Math.PI);
+                }else{
+                    cita=0;
+                }
+            }
+        }else
+        {
+            if(x1<x0){
                 if(y1>y0){
-                    cita= 360*Math.atan(diff_y/diff_x)/(2*Math.PI);
+                    cita=180-360*Math.atan(diff_y/diff_x)/(2*Math.PI);
                 }else
-               {
-                    if(y1<y0){ 
-                        cita=-360*Math.atan(diff_y/diff_x)/(2*Math.PI);
-                    }else{  
+                {
+                    if(y1<y0){
+                        cita=180+360*Math.atan(diff_y/diff_x)/(2*Math.PI);
+                    }else{
+                        cita=180;
+                    }
+                }
+            }else{
+                if(y1>y0){
+                    cita=90;
+                }else
+                {
+                    if(y1<y0){
+                        cita=-90;
+                    }else{
                         cita=0;
                     }
                 }
-            }else
-            {
-                if(x1<x0){
-                    if(y1>y0){
-                        cita=180-360*Math.atan(diff_y/diff_x)/(2*Math.PI);
-                    }else
-                    {
-                        if(y1<y0){ 
-                            cita=180+360*Math.atan(diff_y/diff_x)/(2*Math.PI);
-                        }else{  
-                            cita=180;
-                        }
-                    } 
-                }else{ 
-                    if(y1>y0){ 
-                        cita=90;
-                    }else
-                    {
-                        if(y1<y0){ 
-                            cita=-90;
-                        }else{  
-                            cita=0;
-                        }
-                    }
-                }
             }
-            return cita;
+        }
+        return cita;
     }
 }

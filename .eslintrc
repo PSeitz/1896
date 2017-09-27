@@ -1,6 +1,5 @@
 env:
   es6: true
-  node: true
   browser: true
 extends: 'eslint:recommended'
 rules:
@@ -10,6 +9,11 @@ rules:
   no-unused-vars:
     - warn
   no-console: 0
-  no-undef: 0
+globals:
+     _: true
+     EasyStar: true
+     noise: true
+     faker: true
+     Resurrect: true
 parserOptions:
   sourceType: module

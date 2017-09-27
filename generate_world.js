@@ -1,11 +1,28 @@
 
 import {getDistance} from './util.js'
-import {easystar} from './main.js'
 
 import {City, Ship} from "./classes.js"
 
 function isWater(type){
     return type == "ShallowWater" || type == "DeepWater" || type == "Water"
+}
+
+export const easystar = new EasyStar.js();
+
+export function setUpEasyStar(easystar, world) {
+
+    var grid = new Array(world.height);
+    for (let y = 0; y < world.height; y++) {
+        grid[y] = new Array(world.width);
+        for (let x = 0; x < world.width; x++) {
+            let isReachable = isWater(world.getCellAtXY(x,y).type) || world.getCellAtXY(x,y).isCity
+            grid[y][x] = isReachable ? 0 : 1
+        }
+    }
+    easystar.setGrid(grid);
+    easystar.setAcceptableTiles([0]);
+    easystar.enableSync();
+
 }
 
 export function generateWorld(opt){
@@ -15,14 +32,14 @@ export function generateWorld(opt){
     // noise.seed(Math.random());
     console.time("cells")
     world.cells.forEach(cell => {
-        // cell.data.elevation   = noise.simplex2(cell.x * 10/opt.mapWidth, cell.y * 10/opt.mapHeight)
-        var mod = noise.simplex2(cell.x * 10/opt.mapWidth, cell.y * 10/opt.mapHeight);
-        var value = noise.simplex3(cell.x* 2/opt.mapWidth, cell.y* 2/opt.mapHeight, mod * cell.y/(opt.mapHeight*5));
+        // cell.data.elevation   = noise.simplex2(cell.x * 10/world.width, cell.y * 10/world.height)
+        var mod = noise.simplex2(cell.x * 10/world.width, cell.y * 10/world.height);
+        var value = noise.simplex3(cell.x* 2/world.width, cell.y* 2/world.height, mod * cell.y/(world.height*5));
         cell.data.elevation = value
     })
 
-    world.cells.forEach(cell => cell.data.temperature = noise.simplex2(cell.x/opt.mapWidth, cell.y/opt.mapHeight)) // very slow change
-    world.cells.forEach(cell => cell.data.rainfall    = noise.simplex2(cell.x * 2/opt.mapWidth, cell.y * 2/opt.mapHeight))
+    world.cells.forEach(cell => cell.data.temperature = noise.simplex2(cell.x/world.width, cell.y/world.height)) // very slow change
+    world.cells.forEach(cell => cell.data.rainfall    = noise.simplex2(cell.x * 2/world.width, cell.y * 2/world.height))
     world.cells.forEach(cell => cell.data.drainage    = noise.simplex2(cell.x/20, cell.y/20))
 
     world.cells.forEach(cell => cell.scale())
@@ -95,21 +112,8 @@ export function generateWorld(opt){
 
     console.time("groupCities")
 
-    function setPathFindGrid() {
-        var grid = new Array(opt.mapHeight);
-        for (let y = 0; y < opt.mapHeight; y++) {
-            grid[y] = new Array(opt.mapWidth);
-            for (let x = 0; x < opt.mapWidth; x++) {
-                let isReachable = isWater(world.getCellAtXY(x,y).type) || world.getCellAtXY(x,y).isCity
-                grid[y][x] = isReachable ? 0 : 1
-            }
-        }
-        easystar.setGrid(grid);
-        easystar.setAcceptableTiles([0]);
-        easystar.enableSync();
-    }
 
-    setPathFindGrid()
+    setUpEasyStar(easystar, world)
     groupCities()
     limitNumCities()
 
@@ -124,7 +128,7 @@ export function generateWorld(opt){
 
     // Add Ship
     let startCell = _.sample(cityCells)
-    let playerShip = new Ship(faker.commerce.productName(), 100, 35, startCell, opt.player)
+    let playerShip = new Ship(faker.commerce.productName(), 100, 35, startCell, opt.player.name)
     world.ships.push(playerShip)
 
 }

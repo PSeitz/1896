@@ -1,3 +1,6 @@
+import * as PIXI from 'pixi.js';
+import * as PIXIAA from 'pixi-particles';
+
 function getEmitter(container){
 
     // Create a new emitter

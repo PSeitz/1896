@@ -5,11 +5,21 @@ let canvasHeight = 800;
 let mapWidth = 150
 let mapHeight = 80
 let cellSize = 10
-export const easystar = new EasyStar.js();
 
 
 
-import {Game, WorldMap, minTemperatur, maxTemperatur} from "./classes.js"
+import * as PIXI from 'pixi.js';
+import {Game, WorldMap, WorldCell, Ship, City,SupplyAndDemand, InfluenceArea, Player, minTemperatur, maxTemperatur} from "./classes.js"
+
+window.Game = Game
+window.WorldMap = WorldMap
+window.WorldCell = WorldCell
+window.Ship = Ship
+window.City = City
+window.SupplyAndDemand = SupplyAndDemand
+window.InfluenceArea = InfluenceArea
+window.Player = Player
+
 import * as util from './util.js'
 import * as helper from './helper.js'
 import {cellTypes} from './types.js'
@@ -18,23 +28,33 @@ import * as g from './graphics.js'
 
 let game = new Game(new WorldMap(mapWidth, mapHeight))
 
-import {generateWorld} from "./generate_world.js"
+import {generateWorld, setUpEasyStar} from "./generate_world.js"
 
-generateWorld({world:game.world, seaLevel: 0.2, mapWidth:mapWidth, mapHeight:mapHeight, canvasWidth:canvasWidth, canvasHeight:canvasHeight, player: game.player})
+
+
+// generateWorld({world:game.world, seaLevel: 0.2, mapWidth:mapWidth, mapHeight:mapHeight, canvasWidth:canvasWidth, canvasHeight:canvasHeight, player: game.player})
 
 if (localStorage['savegame1']) {
     console.time("loadGame")
     console.log("File Size: " + localStorage['savegame1'].length / 1000000 + " mb" )
-    game = JSON.parse(localStorage['savegame1'])
+
+    game = new Resurrect().resurrect(localStorage['savegame1']);
+
     console.timeEnd("loadGame")
 }else{
     console.time("generateWorld")
     generateWorld({world:game.world, seaLevel: 0.2, mapWidth:mapWidth, mapHeight:mapHeight, canvasWidth:canvasWidth, canvasHeight:canvasHeight, player: game.player})
     console.timeEnd("generateWorld")
-    localStorage['savegame1'] = JSON.stringify(game)
+
+    localStorage['savegame1'] = new Resurrect().stringify(game);
+
+    // localStorage['savegame1'] = JSON.stringify(game)
 }
 
 let world = game.world;
+
+export const easystar = new EasyStar.js();
+setUpEasyStar(easystar, world)
 
 
 window.onload = function(){
@@ -136,7 +156,7 @@ function openShipMenu(ship){
 
     let text = newText("Drive")
     text.interactive = true;
-    text.click = (mouseData) => showNavigation(world);
+    text.click = (mouseData) => showNavigation(world, ship);
     text.y = 5, text.x = 5
     shipMenu.addChild(text);
     stage.addChild(shipMenu)
@@ -145,50 +165,50 @@ function openShipMenu(ship){
 
 let navigationLayer = null
 
-function showNavigation(world) {
+let shipRouteLayer = null;
+
+function showNavigation(world, ship) {
     navigationLayer = new PIXI.Container();
-    var myGraph = new PIXI.Graphics();
+    let step = cellSize*2.5
+    let cont = new PIXI.Container();
+    cont.addChild(g.drawdash(0,0,step,0,3));
+    cont.addChild(g.drawdash(0,0,0,step,3));
+    cont.addChild(g.drawdash(step,0,step,step,3));
+    cont.addChild(g.drawdash(0,step,step,step,3));
 
-    var dashed = new PIXI.Graphics();
-    g.drawdash(0,0,cellSize*2,0,3, dashed);
-    g.drawdash(0,0,0,cellSize*2,3, dashed);
-    g.drawdash(cellSize*2,0,cellSize*2,cellSize*2,3, dashed);
-    g.drawdash(0,cellSize*2,cellSize*2,cellSize*2,3, dashed);
-    let texture = renderer.generateTexture( graphic);
+    let texture = renderer.generateTexture(cont);
 
-    console.time("cities")
+    function showRoute(ship, city){
+        let pathGraphics = new PIXI.Graphics();
+        shipRouteLayer = new PIXI.Container();
+        let path = easystar.findPath(ship.position.x, ship.position.y, city.cell.x, city.cell.y)
+        console.log(path)
+        for (let cell of path) {
+            g.drawTileRaw(pathGraphics, 0xFF5896, cellSize, cell.x * cellSize, cell.y * cellSize)
+        }
+        shipRouteLayer.addChild(pathGraphics)
+        stage.addChild(shipRouteLayer)
+    }
+
     world.cities.forEach(city => {
-        let x = city.cell.x * cellSize - cellSize / 2
-        let y = city.cell.y * cellSize - cellSize / 4
+        let x = city.cell.x * cellSize
+        let y = city.cell.y * cellSize
 
         let step = cellSize*2.5
 
-        let line = myGraph.lineStyle(2, 0x338686)
-        .moveTo(x, y)
-        .lineTo(x+step, y)
-        .lineTo(x+step, y+step)
-        .lineTo(x, y+step)
-        .lineTo(x, y)
- 
-        navigationLayer.addChild(line)
-
-        // var thing = new PIXI.Graphics();
-        // navigationLayer.addChild(thing);
-        // thing.position.x = x;
-        // thing.position.y = y;
-        // thing.lineStyle(0);
-        // thing.beginFill(0x8bc5ff, 0.4);
-        // thing.drawRect(0,0, cellSize, cellSize);
-        // thing.endFill();
-        // line.mask = thing;
-        // navigationLayer.addChild(g.drawdash(x,y,x+cellSize*2,y,3, myGraph));
-        // navigationLayer.addChild(g.drawdash(x,y,x,y+cellSize*2,3, myGraph));
-        // navigationLayer.addChild(g.drawdash(x+cellSize*2,y,x+cellSize*2,y+cellSize*2,3, myGraph));
-        // navigationLayer.addChild(g.drawdash(x,y+cellSize*2,x+cellSize*2,y+cellSize*2,3, myGraph));
+        let sprite1 = new PIXI.Sprite(texture);
+        sprite1.position.x = x
+        sprite1.position.y = y
+        helper.setXY(sprite1.anchor, 0.5);
+        sprite1.interactive = true
+        sprite1.click = (mouseData) => {
+            // alert("TARGET")
+            showRoute(ship, city)
+        }
+        navigationLayer.addChild(sprite1)
 
 
     })
-    console.timeEnd("cities")
 
     stage.addChild(navigationLayer)
     // let line = g.drawdash(50,50,650,50,1);
@@ -196,15 +216,7 @@ function showNavigation(world) {
 }
 
 function newText(val) { // For prototyping ?
-    var textOptions = {
-        fontFamily: 'Arial', // Set style, size and font
-        fontSize: '14px',
-        fill: 'white', // Set fill color to blue
-        align: 'center', // Center align the text, since it's multiline
-        stroke: '#34495e', // Set stroke color to a dark blue-gray color
-        strokeThickness: 3, // Set stroke thickness to 20
-        lineJoin: 'round' // Set the lineJoin to round instead of 'miter'
-    }
+    var textOptions = { fontFamily: 'Arial', fontSize: '14px', fill: 'white', align: 'center', stroke: '#34495e', strokeThickness: 3, lineJoin: 'round' }
     let text = new PIXI.Text(val ,textOptions);
     // helper.setXY(text.anchor, 0.5);
     text.canvas.style.webkitFontSmoothing = "antialiased";
@@ -221,7 +233,7 @@ function drawCanvas(){
         resolution: window.devicePixelRatio || 1,
         autoResize:true});
 
-    PIXI.cocoontext.CONST.TEXT_RESOLUTION =  window.devicePixelRatio;
+    // PIXI.cocoontext.CONST.TEXT_RESOLUTION =  window.devicePixelRatio;
 
     function drawCells(world){
         let paddingPerSide = 0
@@ -248,6 +260,7 @@ function drawCanvas(){
             let house = g.drawHouse('0xBB3333', Math.round(cellSize*1.5))
             house.x = city.cell.x * cellSize
             house.y = city.cell.y * cellSize
+            helper.setXY(house.anchor, 0.5);
             house.interactive = true
             house.click = (mouseData) => openCityMenu(city)
             stage.addChild(house);
@@ -266,7 +279,7 @@ function drawCanvas(){
             text.x = city.cell.x * cellSize + 5
             if (text.x <= 40) text.anchor.x = .1
             if (text.x >= canvasWidth - 40) text.anchor.x = .9
-            text.y = city.cell.y * cellSize - 5
+            text.y = city.cell.y * cellSize - 15
             text.canvas.style.webkitFontSmoothing = "antialiased";
             stage.addChild(text);
         })
@@ -285,20 +298,20 @@ function drawCanvas(){
         })
 
         // world.cells.filter(cell => cell.isCity).forEach(cell => {
-            // let house = g.drawHouse('0xBB3333', cellSize*1.5)
-            // house.x = cell.x * cellSize
-            // house.y = cell.y * cellSize
-            // stage.addChild(house);
+        // let house = g.drawHouse('0xBB3333', cellSize*1.5)
+        // house.x = cell.x * cellSize
+        // house.y = cell.y * cellSize
+        // stage.addChild(house);
 
-            // var ship1texture = PIXI.loader.resources.shipmap.texture;
-            // var ship1 = new PIXI.Sprite(ship1texture);
-            // ship1.interactive = true;
-            // ship1.click = function(mouseData){
-            //    alert("CLICK!");
-            // }
-            // ship1.x = cell.x * cellSize
-            // ship1.y = cell.y * cellSize
-            // stage.addChild(ship1);
+        // var ship1texture = PIXI.loader.resources.shipmap.texture;
+        // var ship1 = new PIXI.Sprite(ship1texture);
+        // ship1.interactive = true;
+        // ship1.click = function(mouseData){
+        //    alert("CLICK!");
+        // }
+        // ship1.x = cell.x * cellSize
+        // ship1.y = cell.y * cellSize
+        // stage.addChild(ship1);
         // })
         //
         animate()

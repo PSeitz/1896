@@ -18,7 +18,12 @@ export class Game {
         this.cities = [];
         this.day = 0;
 
-        this.player = new Player(3500000)
+        this.player = new Player(3500000, "theplayer")
+        // this.players = [
+        //     new Player(3500000, "theplayer"),
+        //     new Player(3500000, "theplayer")
+        // ]
+
         this.ships = []
     }
     turn(){
@@ -26,14 +31,15 @@ export class Game {
     }
 }
 
-class Player {
-    constructor(money) {
+export class Player {
+    constructor(money, name) {
         this.money = money;
+        this.name = name;
     }
 }
 
 
-class WorldCell {
+export class WorldCell {
     constructor(x, y) {
         this.x = x;
         this.y = y;
@@ -73,9 +79,9 @@ class WorldCell {
 
             let candidates = []
             let self = this
-            function checkSet(){
-                if(candidates.length === 1) self.type = candidates[0]
-            }
+            // function checkSet(){
+            //     if(candidates.length === 1) self.type = candidates[0]
+            // }
             // Check temperature
             _.each(typesWithoutWater, function(type, key){
                 if(inRange(data.temperature, type.temperature)) candidates.push(key)//[key] = true
@@ -141,14 +147,14 @@ export class WorldMap {
 
 
 
-class SupplyAndDemand {
+export class SupplyAndDemand {
     constructor(producingGoods, neededGoods, population) {
         // this.supply = supply;
         // this.demand = demand;
     }
 }
 
-class InfluenceArea{
+export class InfluenceArea{
     constructor(cell, world) {
         this.nearNeighbors = world.getNeighborsWithCell(cell, 3)
     }
