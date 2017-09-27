@@ -15,5 +15,6 @@ globals:
      noise: true
      faker: true
      Resurrect: true
+     Vue: true
 parserOptions:
   sourceType: module
