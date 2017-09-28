@@ -31,7 +31,12 @@ let game = new Game(new WorldMap(mapWidth, mapHeight))
 
 import {generateWorld, setUpEasyStar} from "./generate_world.js"
 
-
+if (module.hot) {
+    module.hot.accept('./graphics.js', function() {
+        console.log('Accepting the updated printMe module!');
+        alert("jaaaa");
+    })
+}
 
 // generateWorld({world:game.world, seaLevel: 0.2, mapWidth:mapWidth, mapHeight:mapHeight, canvasWidth:canvasWidth, canvasHeight:canvasHeight, player: game.player})
 

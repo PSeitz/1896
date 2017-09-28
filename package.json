@@ -4,8 +4,9 @@
   "description": "wirtschaftssimulation",
   "main": "main.js",
   "scripts": {
-    "dev": "webpack-dev-server --host 0.0.0.0 --disable-host-check --inline --hot --env.dev",
-    "build": "rimraf dist && webpack -p --progress --hide-modules"
+    "dev": "webpack-dev-server --host 0.0.0.0 --disable-host-check --inline --hotOnly --env.dev",
+    "build": "rimraf dist && webpack -p --progress --hide-modules",
+    "start": "webpack-dev-server --open"
   },
   "repository": {
     "type": "git",
@@ -27,7 +28,7 @@
     "babel-loader": "^6.4.0",
     "babel-preset-env": "^1.6.0",
     "file-loader": "^0.10.1",
-    "html-webpack-plugin": "^2.24.1",
+    "html-webpack-plugin": "^2.30.1",
     "url-loader": "^0.5.8",
     "webpack": "^2.4.1",
     "webpack-dev-server": "^2.8.2"
