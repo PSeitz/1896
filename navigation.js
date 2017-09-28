@@ -67,6 +67,9 @@ export function showNavigation(world, ship) {
             // alert("TARGET")
             removeRoute()
             showRoute(ship, city)
+
+            let info = g.showInfo([{text:"Und ab gehts"}, {text:"Zeig mir bitte mehr!!"}])
+            stage.addChild(info)
         }
         navigationLayer.addChild(sprite1)
 

@@ -23,6 +23,43 @@ export function drawTileRaw(graphics, color, size, x, y){
     graphics.endFill();
 }
 
+export function newText(val, fontSize) { // For prototyping ?
+    fontSize = fontSize || '14px'
+    var textOptions = { fontFamily: 'Arial', fontSize: fontSize, fill: 'white', align: 'center', stroke: '#34495e', strokeThickness: 3, lineJoin: 'round' }
+    let text = new PIXI.Text(val ,textOptions);
+    // helper.setXY(text.anchor, 0.5);
+    text.canvas.style.webkitFontSmoothing = "antialiased";
+    return text
+}
+
+export function showInfo(data) {
+    let padding = 14
+    let graphics = new PIXI.Graphics();
+    let infoMenu = new PIXI.Container();
+    let textHeight = 40
+
+    graphics.beginFill(0x1d111a, 0.99);
+    graphics.drawRoundedRect(0, 0, 256 + padding * 2, data.length*textHeight + padding * 2, 3)
+    graphics.endFill();
+
+    graphics.beginFill(0x3d321a, 0.99);
+    graphics.drawRoundedRect(padding, padding, 256, data.length*textHeight, 3)
+    graphics.endFill();
+    infoMenu.addChild(graphics)
+    for (var i = 0; i < data.length; i++) {
+        let text = newText(data[i].text, '24px')
+        text.y = i * textHeight + padding;
+        text.x = padding + 4
+        if(data[i].onclick){
+            text.interactive = true
+            text.click = data[i].onclick
+        }
+        infoMenu.addChild(text)
+    }
+    return infoMenu
+}
+
+
 export function drawCityMenu(graphics, menu) {
     graphics.beginFill(0x3d321a, 0.99);
     graphics.drawRoundedRect(0, 0, 128, 32, 3)

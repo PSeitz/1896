@@ -154,7 +154,7 @@ function openShipMenu(ship){
     let graphics = new PIXI.Graphics();
     g.drawCityMenu(graphics, shipMenu)
 
-    let text = newText("Drive")
+    let text = g.newText("Drive")
     text.interactive = true;
     text.click = (mouseData) => toggleNavigation(world, ship);
     text.y = 5, text.x = 5
@@ -164,13 +164,6 @@ function openShipMenu(ship){
 }
 
 
-function newText(val) { // For prototyping ?
-    var textOptions = { fontFamily: 'Arial', fontSize: '14px', fill: 'white', align: 'center', stroke: '#34495e', strokeThickness: 3, lineJoin: 'round' }
-    let text = new PIXI.Text(val ,textOptions);
-    // helper.setXY(text.anchor, 0.5);
-    text.canvas.style.webkitFontSmoothing = "antialiased";
-    return text
-}
 
 function drawCanvas(){
     let canvas = document.getElementById("stage");
