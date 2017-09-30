@@ -4,10 +4,10 @@ import {cellSize, stage, renderer, easystar} from './main.js'
 import * as helper from './helper.js'
 import * as g from './graphics.js'
 
-
 let navigationLayer = null
 let shipRouteLayer = null
 let currentShip = null
+let infoMenu = null
 
 export function endNavigation(){
     if(navigationLayer) stage.removeChild(navigationLayer)
@@ -28,13 +28,17 @@ function drawDashedBorder(step){
 export function toggleNavigation(world, ship){
     if (ship == currentShip) endNavigation();
     else if (navigationLayer) endNavigation();
-    else showNavigation(world, ship)
+    else showNavigationForShip(world, ship)
 }
 
-export function showNavigation(world, ship) {
+export function showNavigationForShip(world, ship){
+    currentShip = ship
+    openNavigation(world)
+}
+
+export function openNavigation(world) {
     endNavigation();
 
-    currentShip = ship
     navigationLayer = new PIXI.Container();
     let step = cellSize*2.5
     let cont = drawDashedBorder(step)
@@ -43,10 +47,10 @@ export function showNavigation(world, ship) {
     function removeRoute(){
         navigationLayer.removeChild(shipRouteLayer)
     }
-    function showRoute(ship, city){
+    function showRoute(currentShip, city){
         let pathGraphics = new PIXI.Graphics();
         shipRouteLayer = new PIXI.Container();
-        let path = easystar.findPath(ship.position.x, ship.position.y, city.cell.x, city.cell.y)
+        let path = easystar.findPath(currentShip.position.x, currentShip.position.y, city.cell.x, city.cell.y)
         for (let cell of path) {
             g.drawTileRaw(pathGraphics, 0xFF5896, cellSize, cell.x * cellSize, cell.y * cellSize)
         }
@@ -66,10 +70,11 @@ export function showNavigation(world, ship) {
         sprite1.click = (mouseData) => {
             // alert("TARGET")
             removeRoute()
-            showRoute(ship, city)
+            showRoute(currentShip, city)
 
-            let info = g.showInfo([{text:"Und ab gehts"}, {text:"Zeig mir bitte mehr!!"}])
-            stage.addChild(info)
+            if(infoMenu)stage.removeChild(infoMenu)
+            infoMenu = g.showInfo([{text:"Und ab gehts"}, {text:"Zeig mir bitte mehr!!"}])
+            stage.addChild(infoMenu)
         }
         navigationLayer.addChild(sprite1)
 
@@ -77,6 +82,4 @@ export function showNavigation(world, ship) {
     })
 
     stage.addChild(navigationLayer)
-    // let line = g.drawdash(50,50,650,50,1);
-    // stage.addChild(line);
 }

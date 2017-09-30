@@ -8,27 +8,27 @@ module.exports = {
         filename: './bundle.js',
         publicPath: '/dist/'
     },
-    module: {
-        rules: [{
-            test: /\.js$/,
-            exclude: /node_modules/,
-            loader: 'babel-loader',
-            options: {
-                presets: [
-                    ["env", {
-                        "targets": {
-                            "browsers": ["last 2 versions", "safari >= 7"]
-                        }
-                    }]
-                ]
-            }
-        }]
-    },
-    devServer: {
-        // contentBase: '/dist/',
-        hot: true,
-        inline: true
-    },
+    // module: {
+    //     rules: [{
+    //         test: /\.js$/,
+    //         exclude: /node_modules/,
+    //         loader: 'babel-loader',
+    //         options: {
+    //             presets: [
+    //                 ["env", {
+    //                     "targets": {
+    //                         "browsers": ["last 2 versions", "safari >= 7"]
+    //                     }
+    //                 }]
+    //             ]
+    //         }
+    //     }]
+    // },
+    // devServer: {
+    //     // contentBase: '/dist/',
+    //     hot: true,
+    //     inline: true
+    // },
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NamedModulesPlugin()

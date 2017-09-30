@@ -1,11 +1,10 @@
 
 
-let canvasWidth = 1500;
-let canvasHeight = 800;
+export const canvasWidth = 1500;
+export const canvasHeight = 800;
 let mapWidth = 150
 let mapHeight = 80
 export const cellSize = 10
-
 
 import * as PIXI from 'pixi.js';
 import {Game, WorldMap, WorldCell, Ship, City,SupplyAndDemand, InfluenceArea, Player, minTemperatur, maxTemperatur} from "./classes.js"
@@ -25,17 +24,44 @@ import {cellTypes} from './types.js'
 
 import * as g from './graphics.js'
 
+import * as test from './test.js'
+import {drawCanvas, redrawCanvas} from './drawWorld.js'
 import {showNavigation, toggleNavigation, endNavigation} from './navigation.js'
 
 let game = new Game(new WorldMap(mapWidth, mapHeight))
 
 import {generateWorld, setUpEasyStar} from "./generate_world.js"
 
+function refresh() {
+    // drawCanvas();
+    console.log("redrawing")
+    redrawCanvas(world, stage)
+}
+
 if (module.hot) {
-    module.hot.accept('./graphics.js', function() {
-        console.log('Accepting the updated printMe module!');
-        alert("jaaaa");
+
+    module.hot.accept(['./graphics.js', './drawWorld.js', './navigation.js','./test.js', './classes.js', './generate_world.js', './helper.js', './keyboard.js', './types.js', './util.js' ], function() {
+        console.log('OOOH BOY')
+        refresh()
+        g.showInfo([])
     })
+
+    // module.hot.accept('./graphics.js', function() {refresh()} )
+    // module.hot.accept('./navigation.js', () => console.log('RELOADED navigation.JS!') )
+    // module.hot.accept('./test.js', () => {
+    //     console.log('RELOADED test.JS!')
+    //     test.testo()
+    // })
+    module.hot.accept();
+
+    module.hot.dispose(data => {
+        console.log('Dispose the stuff')
+        refresh()
+        // Clean up and pass data to the updated module...
+    })
+
+}else{
+    alert("NO HOT")
 }
 
 // generateWorld({world:game.world, seaLevel: 0.2, mapWidth:mapWidth, mapHeight:mapHeight, canvasWidth:canvasWidth, canvasHeight:canvasHeight, player: game.player})
@@ -68,30 +94,7 @@ window.onload = function(){
 
 };
 
-// game = JSON.parse(localStorage['savegame1'])
-// world = game.world
-
-
-let sprites = {
-
-}
-
-function temperatureToColor(value){
-    let val = Math.round(util.scale(value,minTemperatur, maxTemperatur, -255, 0)) * -1
-    let hex = val.toString(16)
-    return '0xFF'+hex+hex
-}
-function elevationToColor(value){
-    let val = util.scale(value,-1, 1, -255, 0)
-    let hex = Math.round(val*-1).toString(16)
-    return '0x'+hex+hex+hex
-}
-function rainfallToColor(value){
-    let val = Math.round(util.scale(value, -1 ,1 , -255, 0)) * -1
-    let hex = val.toString(16)
-    let color = '0x'+hex+hex+'FF'
-    return color
-}
+let layers = {}
 
 function setupMovie (baseString){
 
@@ -117,7 +120,7 @@ function closeCityMenu(city){
     stage.removeChild(menu)
 }
 
-function openCityMenu(city){
+export function openCityMenu(city){
     let xPos = city.cell.x * cellSize + 20
     let yPos = city.cell.y * cellSize - 5
     if (menu) {
@@ -142,7 +145,7 @@ function openCityMenu(city){
 }
 
 let shipMenu = null
-function openShipMenu(ship){
+export function openShipMenu(ship){
     let xPos = ship.position.x * cellSize + 20
     let yPos = ship.position.y * cellSize - 5
     if (shipMenu) {
@@ -169,8 +172,7 @@ function openShipMenu(ship){
 }
 
 
-
-function drawCanvas(){
+function start(){
     let canvas = document.getElementById("stage");
     canvas.width=canvasWidth;
     canvas.height=canvasHeight;
@@ -180,110 +182,19 @@ function drawCanvas(){
         resolution: window.devicePixelRatio || 1,
         autoResize:true});
 
-    // PIXI.cocoontext.CONST.TEXT_RESOLUTION =  window.devicePixelRatio;
-
-    function drawCells(world){
-        let paddingPerSide = 0
-        sprites.container = new PIXI.Container();
-        sprites.temperatureView = new PIXI.Graphics();
-        sprites.worldView = new PIXI.Graphics();
-        sprites.elevationView = new PIXI.Graphics();
-        sprites.rainFallView = new PIXI.Graphics();
-        for (var i = 0; i < world.cells.length; i++) {
-            var cell = world.cells[i];
-            let x = paddingPerSide + cell.x * cellSize
-            let y = paddingPerSide + cell.y * cellSize
-            let type = cellTypes[cell.type]
-            g.drawTileRaw(sprites.worldView, type.color, cellSize, x, y)
-            g.drawTileRaw(sprites.temperatureView, temperatureToColor(cell.data.temperature), cellSize, x, y)
-            g.drawTileRaw(sprites.elevationView, elevationToColor(cell.data.elevation), cellSize, x, y)
-            g.drawTileRaw(sprites.rainFallView, rainfallToColor(cell.data.rainfall), cellSize, x, y)
-
-        }
-        sprites.container.addChild(sprites.worldView);
-        stage.addChild(sprites.container);
-
-        world.cities.forEach(city => {
-            let house = g.drawHouse('0xBB3333', Math.round(cellSize*1.5))
-            house.x = city.cell.x * cellSize
-            house.y = city.cell.y * cellSize
-            helper.setXY(house.anchor, 0.5);
-            house.interactive = true
-            house.click = (mouseData) => openCityMenu(city)
-            stage.addChild(house);
-
-            var textOptions = {
-                fontFamily: 'Arial', // Set style, size and font
-                fontSize: '14px',
-                fill: 'white', // Set fill color to blue
-                align: 'center', // Center align the text, since it's multiline
-                stroke: '#34495e', // Set stroke color to a dark blue-gray color
-                strokeThickness: 3, // Set stroke thickness to 20
-                lineJoin: 'round' // Set the lineJoin to round instead of 'miter'
-            }
-            let text = new PIXI.Text(city.name ,textOptions);
-            helper.setXY(text.anchor, 0.5);
-            text.x = city.cell.x * cellSize + 5
-            if (text.x <= 40) text.anchor.x = .1
-            if (text.x >= canvasWidth - 40) text.anchor.x = .9
-            text.y = city.cell.y * cellSize - 15
-            text.canvas.style.webkitFontSmoothing = "antialiased";
-            stage.addChild(text);
-        })
-
-
-        world.ships.forEach(ship => {
-            var ship1texture = PIXI.loader.resources.shipmap.texture;
-            var ship1 = new PIXI.Sprite(ship1texture);
-            ship1.interactive = true;
-            ship1.click = function(mouseData){
-                openShipMenu(ship);
-            }
-            ship1.x = ship.position.x * cellSize
-            ship1.y = ship.position.y * cellSize
-            stage.addChild(ship1);
-        })
-
-        // world.cells.filter(cell => cell.isCity).forEach(cell => {
-        // let house = g.drawHouse('0xBB3333', cellSize*1.5)
-        // house.x = cell.x * cellSize
-        // house.y = cell.y * cellSize
-        // stage.addChild(house);
-
-        // var ship1texture = PIXI.loader.resources.shipmap.texture;
-        // var ship1 = new PIXI.Sprite(ship1texture);
-        // ship1.interactive = true;
-        // ship1.click = function(mouseData){
-        //    alert("CLICK!");
-        // }
-        // ship1.x = cell.x * cellSize
-        // ship1.y = cell.y * cellSize
-        // stage.addChild(ship1);
-        // })
-        //
-        animate()
-
-    }
-    drawCells(world)
-    renderer.render(stage)
-
-    function animate() {
-        // render the stage container
-        renderer.render(stage);
-        requestAnimationFrame(animate);
-    }
-
+    drawCanvas(renderer, world, layers, stage, cellSize, canvasWidth)
 }
+
 
 function andNowDraw(el) {
-    sprites.container.removeChildren();
-    sprites.container.addChild(el);
+    layers.container.removeChildren();
+    layers.container.addChild(el);
     renderer.render(stage)
 }
-function showTemperature() { andNowDraw(sprites.temperatureView)}
-function showMap() {andNowDraw(sprites.worldView)}
-function showElevation() { andNowDraw(sprites.elevationView) }
-function showRainFall() { andNowDraw(sprites.rainFallView) }
+function showTemperature() { andNowDraw(layers.temperatureView)}
+function showMap() {andNowDraw(layers.worldView)}
+function showElevation() { andNowDraw(layers.elevationView) }
+function showRainFall() { andNowDraw(layers.rainFallView) }
 
 window.showTemperature = showTemperature
 window.showMap = showMap
@@ -297,7 +208,7 @@ function loadImagesAndDraw(){
         .add("ship3", "img/shiplarge_1.jpg")
         .add("shipmap", "img/ship_map.png")
         .add('beer','img/beer/beer.json')
-        .load(drawCanvas);
+        .load(() => start());
 
     new Vue({
         el: '#money',
