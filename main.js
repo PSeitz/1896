@@ -9,6 +9,13 @@ export const cellSize = 10
 import * as PIXI from 'pixi.js';
 import {Game, WorldMap, WorldCell, Ship, City,SupplyAndDemand, InfluenceArea, Player, minTemperatur, maxTemperatur} from "./classes.js"
 
+import * as g from './graphics.js'
+
+import {drawCanvas, redrawCanvas} from './drawWorld.js'
+import {showNavigation, endNavigation} from './navigation.js'
+
+import * as state from './state.js'
+
 window.Game = Game
 window.WorldMap = WorldMap
 window.WorldCell = WorldCell
@@ -18,15 +25,7 @@ window.SupplyAndDemand = SupplyAndDemand
 window.InfluenceArea = InfluenceArea
 window.Player = Player
 
-import * as util from './util.js'
-import * as helper from './helper.js'
-import {cellTypes} from './types.js'
 
-import * as g from './graphics.js'
-
-import * as test from './test.js'
-import {drawCanvas, redrawCanvas} from './drawWorld.js'
-import {showNavigation, toggleNavigation, endNavigation} from './navigation.js'
 
 let game = new Game(new WorldMap(mapWidth, mapHeight))
 
@@ -43,7 +42,7 @@ if (module.hot) {
     module.hot.accept(['./graphics.js', './drawWorld.js', './navigation.js','./test.js', './classes.js', './generate_world.js', './helper.js', './keyboard.js', './types.js', './util.js' ], function() {
         console.log('OOOH BOY')
         refresh()
-        g.showInfo([])
+        // g.showInfo([])
     })
 
     // module.hot.accept('./graphics.js', function() {refresh()} )
@@ -83,7 +82,7 @@ if (localStorage['savegame1']) {
     // localStorage['savegame1'] = JSON.stringify(game)
 }
 
-let world = game.world;
+export let world = game.world;
 
 export const easystar = new EasyStar.js();
 setUpEasyStar(easystar, world)
@@ -144,17 +143,12 @@ export function openCityMenu(city){
 
 }
 
+
 let shipMenu = null
 export function openShipMenu(ship){
     let xPos = ship.position.x * cellSize + 20
     let yPos = ship.position.y * cellSize - 5
-    if (shipMenu) {
-        stage.removeChild(shipMenu)
-        if (shipMenu.x == xPos && shipMenu.y == yPos) { // same shipMenu, don't draw new menu
-            shipMenu = null
-            return
-        }
-    }
+    if (shipMenu) closeShipMenu()
     shipMenu = new PIXI.Container();
     shipMenu.x = xPos
     shipMenu.y = yPos
@@ -164,11 +158,18 @@ export function openShipMenu(ship){
 
     let text = g.newText("Drive")
     text.interactive = true;
-    text.click = (mouseData) => toggleNavigation(world, ship);
+    text.click = (mouseData) =>{
+        if (state.menuState.showShipNavigation == ship) delete state.menuState.showShipNavigation
+        else state.menuState.showShipNavigation = ship
+    };
     text.y = 5, text.x = 5
     shipMenu.addChild(text);
     stage.addChild(shipMenu)
+}
 
+export function closeShipMenu(){
+    if (shipMenu) stage.removeChild(shipMenu)
+    shipMenu = null
 }
 
 

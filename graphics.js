@@ -33,11 +33,11 @@ export function newText(val, fontSize) { // For prototyping ?
 }
 
 export function showInfo(data) {
-    let padding = 2
+    let padding = 15
     console.log("padding " + padding)
     let graphics = new PIXI.Graphics();
     let infoMenu = new PIXI.Container();
-    let textHeight = 38
+    let textHeight = 36
 
     graphics.beginFill(0x1d111a, 0.99);
     graphics.drawRoundedRect(0, 0, 256 + padding * 2, data.length*textHeight + padding * 2, 3)

@@ -1,19 +1,21 @@
 import * as PIXI from 'pixi.js';
 
-import {cellSize, stage, renderer, easystar} from './main.js'
+import {cellSize, stage, renderer, easystar, world} from './main.js'
 import * as helper from './helper.js'
 import * as g from './graphics.js'
+import * as state from './state.js'
 
 let navigationLayer = null
 let shipRouteLayer = null
-let currentShip = null
 let infoMenu = null
 
 export function endNavigation(){
     if(navigationLayer) stage.removeChild(navigationLayer)
-    currentShip = null
     navigationLayer = null
     shipRouteLayer= null
+
+    if(infoMenu)stage.removeChild(infoMenu)
+    infoMenu= null
 }
 
 function drawDashedBorder(step){
@@ -25,18 +27,11 @@ function drawDashedBorder(step){
     return cont
 }
 
-export function toggleNavigation(world, ship){
-    if (ship == currentShip) endNavigation();
-    else if (navigationLayer) endNavigation();
-    else showNavigationForShip(world, ship)
-}
+// export function showNavigation(ship){
+//     startNavigation()
+// }
 
-export function showNavigationForShip(world, ship){
-    currentShip = ship
-    openNavigation(world)
-}
-
-export function openNavigation(world) {
+export function startNavigation() {
     endNavigation();
 
     navigationLayer = new PIXI.Container();
@@ -46,16 +41,6 @@ export function openNavigation(world) {
 
     function removeRoute(){
         navigationLayer.removeChild(shipRouteLayer)
-    }
-    function showRoute(currentShip, city){
-        let pathGraphics = new PIXI.Graphics();
-        shipRouteLayer = new PIXI.Container();
-        let path = easystar.findPath(currentShip.position.x, currentShip.position.y, city.cell.x, city.cell.y)
-        for (let cell of path) {
-            g.drawTileRaw(pathGraphics, 0xFF5896, cellSize, cell.x * cellSize, cell.y * cellSize)
-        }
-        shipRouteLayer.addChild(pathGraphics)
-        navigationLayer.addChild(shipRouteLayer)
     }
 
     world.cities.forEach(city => {
@@ -70,7 +55,7 @@ export function openNavigation(world) {
         sprite1.click = (mouseData) => {
             // alert("TARGET")
             removeRoute()
-            showRoute(currentShip, city)
+            showRoute(state.menuState.showShipNavigation, city)
 
             if(infoMenu)stage.removeChild(infoMenu)
             infoMenu = g.showInfo([{text:"Und ab gehts"}, {text:"Zeig mir bitte mehr!!"}])
@@ -78,8 +63,18 @@ export function openNavigation(world) {
         }
         navigationLayer.addChild(sprite1)
 
-
     })
 
     stage.addChild(navigationLayer)
+}
+
+export function showRoute(currentShip, city){
+    let pathGraphics = new PIXI.Graphics();
+    shipRouteLayer = new PIXI.Container();
+    let path = easystar.findPath(currentShip.position.x, currentShip.position.y, city.cell.x, city.cell.y)
+    for (let cell of path) {
+        g.drawTileRaw(pathGraphics, 0xFF5896, cellSize, cell.x * cellSize, cell.y * cellSize)
+    }
+    shipRouteLayer.addChild(pathGraphics)
+    navigationLayer.addChild(shipRouteLayer)
 }

@@ -8,7 +8,9 @@ import {cellTypes} from './types.js'
 
 import * as g from './graphics.js'
 
-import {openCityMenu, openShipMenu, cellSize, canvasWidth} from './main.js'
+import * as state from './state.js'
+
+import {openCityMenu, cellSize, canvasWidth} from './main.js'
 
 let shipLayer = null;
 let cityLayer = null;
@@ -20,7 +22,13 @@ function drawShips(world, stage){
         var ship1texture = PIXI.loader.resources.shipmap.texture;
         var ship1 = new PIXI.Sprite(ship1texture);
         ship1.interactive = true;
-        ship1.click = (mouseData) =>  openShipMenu(ship);
+        ship1.click = (mouseData) =>  {
+            // openShipMenu(ship)
+
+            if (state.menuState.showShipMenu == ship) delete state.menuState.showShipMenu
+            else state.menuState.showShipMenu = ship
+
+        };
         ship1.x = ship.position.x * cellSize
         ship1.y = ship.position.y * cellSize
         shipLayer.addChild(ship1);
@@ -124,6 +132,7 @@ export function drawCanvas(renderer, world, layers, stage, cellSize){
 export function redrawCanvas(world, stage){
     drawShips(world, stage)
     drawCities(world, stage)
+    state.reassign()
 }
 
 function temperatureToColor(value){
