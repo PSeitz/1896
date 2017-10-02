@@ -5,6 +5,8 @@ import * as helper from './helper.js'
 import * as g from './graphics.js'
 import * as state from './state.js'
 
+import * as sound from './sounds.js'
+
 let navigationLayer = null
 let shipRouteLayer = null
 let infoMenu = null
@@ -27,9 +29,7 @@ function drawDashedBorder(step){
     return cont
 }
 
-// export function showNavigation(ship){
-//     startNavigation()
-// }
+
 
 export function startNavigation() {
     endNavigation();
@@ -39,13 +39,11 @@ export function startNavigation() {
     let cont = drawDashedBorder(step)
     let texture = renderer.generateTexture(cont);
 
-    function removeRoute(){
-        navigationLayer.removeChild(shipRouteLayer)
-    }
-
     world.cities.forEach(city => {
         let x = city.cell.x * cellSize
         let y = city.cell.y * cellSize
+
+        if(state.menuState.showShipNavigation.position.x == city.cell.x && state.menuState.showShipNavigation.position.y == city.cell.y) return
 
         let sprite1 = new PIXI.Sprite(texture);
         sprite1.position.x = x
@@ -53,19 +51,38 @@ export function startNavigation() {
         helper.setXY(sprite1.anchor, 0.5);
         sprite1.interactive = true
         sprite1.click = (mouseData) => {
-            // alert("TARGET")
-            removeRoute()
-            showRoute(state.menuState.showShipNavigation, city)
-
-            if(infoMenu)stage.removeChild(infoMenu)
-            infoMenu = g.showInfo([{text:"Und ab gehts"}, {text:"Zeig mir bitte mehr!!"}])
-            stage.addChild(infoMenu)
+            if (state.menuState.showRouteInfo && state.menuState.showRouteInfo.city == city) delete state.menuState.showRouteInfo
+            else state.menuState.showRouteInfo = {city:city, ship: state.menuState.showShipNavigation}
         }
         navigationLayer.addChild(sprite1)
-
     })
 
     stage.addChild(navigationLayer)
+}
+
+export function removeRouteInfo(){
+    navigationLayer.removeChild(shipRouteLayer)
+}
+
+export function showInfoForRoute(opt) {
+    removeRouteInfo()
+    showRoute(opt.ship, opt.city)
+
+    if(infoMenu)stage.removeChild(infoMenu)
+    infoMenu = g.showInfo([
+        {text:"Und ab gehts", onclick: ()=>{
+            // alert("ja")
+            sound.playRandom("pirate.ja")
+            opt.ship.drivingTo = opt.city
+            delete state.menuState.showRouteInfo
+            delete state.menuState.showShipNavigation
+            delete state.menuState.showShipMenu
+        }},
+        {text:"Zeig mir bitte mehr!!", onclick: ()=>{
+            alert("mäh")
+        }}]
+    )
+    navigationLayer.addChild(infoMenu)
 }
 
 export function showRoute(currentShip, city){

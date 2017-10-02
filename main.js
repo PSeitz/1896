@@ -9,12 +9,7 @@ export const cellSize = 10
 import * as PIXI from 'pixi.js';
 import {Game, WorldMap, WorldCell, Ship, City,SupplyAndDemand, InfluenceArea, Player, minTemperatur, maxTemperatur} from "./classes.js"
 
-import * as g from './graphics.js'
-
-import {drawCanvas, redrawCanvas} from './drawWorld.js'
-import {showNavigation, endNavigation} from './navigation.js'
-
-import * as state from './state.js'
+import * as sound from './sounds.js'
 
 window.Game = Game
 window.WorldMap = WorldMap
@@ -25,62 +20,59 @@ window.SupplyAndDemand = SupplyAndDemand
 window.InfluenceArea = InfluenceArea
 window.Player = Player
 
+import * as g from './graphics.js'
 
+import {drawCanvas, redrawCanvas} from './drawWorld.js'
+import {showNavigation, endNavigation} from './navigation.js'
 
-let game = new Game(new WorldMap(mapWidth, mapHeight))
+import * as state from './state.js'
+
 
 import {generateWorld, setUpEasyStar} from "./generate_world.js"
 
-function refresh() {
-    // drawCanvas();
-    console.log("redrawing")
-    redrawCanvas(world, stage)
-}
 
 if (module.hot) {
-
-    module.hot.accept(['./graphics.js', './drawWorld.js', './navigation.js','./test.js', './classes.js', './generate_world.js', './helper.js', './keyboard.js', './types.js', './util.js' ], function() {
+    module.hot.accept(['./graphics.js', './drawWorld.js', './navigation.js','./test.js', './classes.js', './generate_world.js', './helper.js', './keyboard.js', './types.js', './util.js', './state.js' ], function() {
         console.log('OOOH BOY')
-        refresh()
+        redrawCanvas(world, stage)
         // g.showInfo([])
     })
-
-    // module.hot.accept('./graphics.js', function() {refresh()} )
-    // module.hot.accept('./navigation.js', () => console.log('RELOADED navigation.JS!') )
-    // module.hot.accept('./test.js', () => {
-    //     console.log('RELOADED test.JS!')
-    //     test.testo()
-    // })
     module.hot.accept();
-
-    module.hot.dispose(data => {
-        console.log('Dispose the stuff')
-        refresh()
-        // Clean up and pass data to the updated module...
-    })
+    // module.hot.dispose(data => {
+    //     console.log('Dispose the stuff')
+    //     refreshCanvas()
+    //     // Clean up and pass data to the updated module...
+    // })
 
 }else{
     alert("NO HOT")
 }
 
 // generateWorld({world:game.world, seaLevel: 0.2, mapWidth:mapWidth, mapHeight:mapHeight, canvasWidth:canvasWidth, canvasHeight:canvasHeight, player: game.player})
+export function ressurect(data){
+    return new Resurrect().resurrect(data);
+}
+export function bury(data){
+    return new Resurrect().stringify(data)
+}
 
+let game;
 if (localStorage['savegame1']) {
     console.time("loadGame")
     console.log("File Size: " + localStorage['savegame1'].length / 1000000 + " mb" )
 
-    game = new Resurrect().resurrect(localStorage['savegame1']);
+    game = ressurect(localStorage['savegame1']);
 
     console.timeEnd("loadGame")
 }else{
+    game = new Game(new WorldMap(mapWidth, mapHeight))
     console.time("generateWorld")
     generateWorld({world:game.world, seaLevel: 0.2, mapWidth:mapWidth, mapHeight:mapHeight, canvasWidth:canvasWidth, canvasHeight:canvasHeight, player: game.player})
     console.timeEnd("generateWorld")
 
-    localStorage['savegame1'] = new Resurrect().stringify(game);
-
-    // localStorage['savegame1'] = JSON.stringify(game)
+    localStorage['savegame1'] = bury(game);
 }
+window.game = game
 
 export let world = game.world;
 
@@ -143,9 +135,9 @@ export function openCityMenu(city){
 
 }
 
-
 let shipMenu = null
 export function openShipMenu(ship){
+    sound.playRandom("pirate")
     let xPos = ship.position.x * cellSize + 20
     let yPos = ship.position.y * cellSize - 5
     if (shipMenu) closeShipMenu()
@@ -172,7 +164,6 @@ export function closeShipMenu(){
     shipMenu = null
 }
 
-
 function start(){
     let canvas = document.getElementById("stage");
     canvas.width=canvasWidth;
@@ -197,10 +188,19 @@ function showMap() {andNowDraw(layers.worldView)}
 function showElevation() { andNowDraw(layers.elevationView) }
 function showRainFall() { andNowDraw(layers.rainFallView) }
 
+function nextTurn(){
+    for (let ship of world.ships) {
+        ship.move()
+    }
+    redrawCanvas(world, stage)
+}
+
+
 window.showTemperature = showTemperature
 window.showMap = showMap
 window.showElevation = showElevation
 window.showRainFall = showRainFall
+window.nextTurn = nextTurn
 
 function loadImagesAndDraw(){
     let loader = PIXI.loader
@@ -217,7 +217,6 @@ function loadImagesAndDraw(){
             money: 'Hello Vue.js!'
         }
     })
-
 }
 
 function create2DArray(width, height){

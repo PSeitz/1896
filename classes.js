@@ -2,6 +2,8 @@
 import {cellTypes} from './types.js'
 import {inRange,scale} from './util.js'
 
+import {cellSize, stage, renderer, easystar, world} from './main.js'
+
 let typesWithoutWater = Object.assign({}, cellTypes);
 delete typesWithoutWater.ShallowWater
 delete typesWithoutWater.DeepWater
@@ -15,7 +17,7 @@ export let minTemperatur = _.minBy(_.values(cellTypes), el => (el.temperature ? 
 export class Game {
     constructor(world) {
         this.world = world;
-        this.cities = [];
+        // this.cities = [];
         this.day = 0;
 
         this.player = new Player(3500000, "theplayer")
@@ -24,7 +26,7 @@ export class Game {
         //     new Player(3500000, "theplayer")
         // ]
 
-        this.ships = []
+        // this.ships = []
     }
     turn(){
 
@@ -188,13 +190,19 @@ export class City {
 
 
 export class Ship {
-    constructor(name, condition, capacity, position, owner) {
+    constructor(name, condition, capacity, position, owner, drivingTo) {
         this.name = name;
         this.condition = condition;
         this.capacity = capacity;
         this.position = position
         this.owner = owner
+        this.drivingTo = drivingTo
     }
     move(delta){
+
+        let path = easystar.findPath(this.position.x, this.position.y, this.drivingTo.cell.x, this.drivingTo.cell.y)
+        if(path == null) delete this.drivingTo
+        else this.position = path[1];
+
     }
 }

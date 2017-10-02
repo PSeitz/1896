@@ -17,5 +17,6 @@ globals:
      Resurrect: true
      Vue: true
      module: true
+     Howl: true
 parserOptions:
   sourceType: module

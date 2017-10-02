@@ -1,9 +1,14 @@
 
-import {openCityMenu, openShipMenu, closeShipMenu} from './main.js'
+import {openCityMenu, openShipMenu, closeShipMenu, ressurect, bury} from './main.js'
 
-import {startNavigation, endNavigation} from './navigation.js'
+import {startNavigation, endNavigation, showInfoForRoute, removeRouteInfo} from './navigation.js'
 
-const _menuState = {};
+if(!window._menuState){
+    window._menuState = {}
+}
+// const _menuState = {};
+
+let keys = ["showShipMenu", "showShipNavigation", "showRouteInfo"]
 
 const handler = {
     set(target, key, value) {
@@ -11,31 +16,37 @@ const handler = {
         target[key] = value;
         if (key == "showShipMenu") { openShipMenu(value) }
         if (key == "showShipNavigation") { startNavigation(value) }
+        if (key == "showRouteInfo") { showInfoForRoute(value) }
+        // localStorage['state'] = bury(window._menuState);
+        // console.log(localStorage['state'])
         return true
     },
     deleteProperty(target, key) {
         console.log(`Deleting ${key}`)
         if (key == "showShipMenu") { closeShipMenu() }
         if (key == "showShipNavigation") { endNavigation() }
+        if (key == "showRouteInfo") { removeRouteInfo() }
         delete target[key];
         return true
     }
 };
 
-export const menuState = new Proxy(_menuState, handler);
+export const menuState = new Proxy(window._menuState, handler);
 
 export function reassign(){
-    reassignKey("showShipMenu")
-    reassignKey("showShipNavigation")
-    // for(let el in _menuState){
-    //     let tmp = _menuState[el];
-    //     delete menuState[el]
-    //     menuState[el] = tmp
-    // }
+    for(let key of keys){ reassignKey(key) }
 }
 
 function reassignKey(key){
-    let tmp = _menuState[key];
-    delete menuState[key]
-    menuState[key] = tmp
+    let tmp = menuState[key];
+    if(tmp){
+        delete menuState[key]
+        menuState[key] = tmp
+    }
+
 }
+
+
+
+
+// localStorage['state'] = new Resurrect().resurrect(localStorage['state']);

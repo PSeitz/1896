@@ -33,11 +33,11 @@ export function newText(val, fontSize) { // For prototyping ?
 }
 
 export function showInfo(data) {
-    let padding = 15
+    let padding = 2
     console.log("padding " + padding)
     let graphics = new PIXI.Graphics();
     let infoMenu = new PIXI.Container();
-    let textHeight = 36
+    let textHeight = 30
 
     graphics.beginFill(0x1d111a, 0.99);
     graphics.drawRoundedRect(0, 0, 256 + padding * 2, data.length*textHeight + padding * 2, 3)
@@ -46,10 +46,20 @@ export function showInfo(data) {
     graphics.beginFill(0x3d321a, 0.99);
     graphics.drawRoundedRect(padding, padding, 256, data.length*textHeight, 3)
     graphics.endFill();
+
     infoMenu.addChild(graphics)
     for (var i = 0; i < data.length; i++) {
-        let text = newText(data[i].text, '24px')
-        text.y = i * textHeight + padding;
+        let yPos = i * textHeight + padding;
+        if(data[i].onclick){
+            let background = new PIXI.Graphics();
+            background.beginFill(0x2d212a, 0.99);
+            background.drawRoundedRect(0, yPos, 256 + padding * 2 - 4, textHeight - 2, 3)
+            background.endFill();
+            infoMenu.addChild(background)
+        }
+
+        let text = newText(data[i].text, '20px')
+        text.y = yPos
         text.x = padding + 4
         if(data[i].onclick){
             text.interactive = true

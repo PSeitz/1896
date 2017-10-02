@@ -8,6 +8,8 @@ import {cellTypes} from './types.js'
 
 import * as g from './graphics.js'
 
+import * as sound from './sounds.js'
+
 import * as state from './state.js'
 
 import {openCityMenu, cellSize, canvasWidth} from './main.js'
