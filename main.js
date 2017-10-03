@@ -138,6 +138,7 @@ export function openCityMenu(city){
 let shipMenu = null
 export function openShipMenu(ship){
     sound.playRandom("pirate")
+    sound.play("ship.pirate.bay")
     let xPos = ship.position.x * cellSize + 20
     let yPos = ship.position.y * cellSize - 5
     if (shipMenu) closeShipMenu()
@@ -160,6 +161,7 @@ export function openShipMenu(ship){
 }
 
 export function closeShipMenu(){
+    sound.get("ship.pirate.bay").fade(sound.get("ship.pirate.bay").volume(), 0, 2500);
     if (shipMenu) stage.removeChild(shipMenu)
     shipMenu = null
 }

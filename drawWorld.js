@@ -24,6 +24,7 @@ function drawShips(world, stage){
         var ship1texture = PIXI.loader.resources.shipmap.texture;
         var ship1 = new PIXI.Sprite(ship1texture);
         ship1.interactive = true;
+        helper.setXY(ship1.anchor, 0.5, 0.2);
         ship1.click = (mouseData) =>  {
             // openShipMenu(ship)
 
@@ -117,8 +118,8 @@ export function drawCanvas(renderer, world, layers, stage, cellSize){
     }
 
     drawWorldCells(world)
-    drawShips(world, stage)
     drawCities(world, stage)
+    drawShips(world, stage)
     animate()
 
     renderer.render(stage)

@@ -199,10 +199,13 @@ export class Ship {
         this.drivingTo = drivingTo
     }
     move(delta){
+        if(!this.drivingTo) return
+        if(!this.currentPath)
+            this.currentPath = easystar.findPath(this.position.x, this.position.y, this.drivingTo.cell.x, this.drivingTo.cell.y)
+        // if(this.currentPath == null) delete this.drivingTo
 
-        let path = easystar.findPath(this.position.x, this.position.y, this.drivingTo.cell.x, this.drivingTo.cell.y)
-        if(path == null) delete this.drivingTo
-        else this.position = path[1];
+        this.currentPath.shift()
+        this.position = this.currentPath[1];
 
     }
 }
