@@ -197,6 +197,14 @@ function nextTurn(){
     redrawCanvas(world, stage)
 }
 
+export function getPixelPos(opt){
+    return {x:opt.x  * cellSize , y:opt.y  * cellSize}
+}
+export function setPixelPos(opt, target){
+    let {x, y} = getPixelPos(opt)
+    target.x = x
+    target.y = y
+}
 
 window.showTemperature = showTemperature
 window.showMap = showMap

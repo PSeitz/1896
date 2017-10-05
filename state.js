@@ -1,7 +1,7 @@
 
 import {openCityMenu, openShipMenu, closeShipMenu, ressurect, bury} from './main.js'
 
-import {startNavigation, endNavigation, showInfoForRoute, removeRouteInfo} from './navigation.js'
+import {startNavigation, endNavigation, showInfoForRoute, removeRoute} from './navigation.js'
 
 if(!window._menuState){
     window._menuState = {}
@@ -25,7 +25,7 @@ const handler = {
         console.log(`Deleting ${key}`)
         if (key == "showShipMenu") { closeShipMenu() }
         if (key == "showShipNavigation") { endNavigation() }
-        if (key == "showRouteInfo") { removeRouteInfo() }
+        if (key == "showRouteInfo") { removeRoute() }
         delete target[key];
         return true
     }

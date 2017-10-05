@@ -60,13 +60,13 @@ export function startNavigation() {
     stage.addChild(navigationLayer)
 }
 
-export function removeRouteInfo(){
+export function removeRoute(){
     navigationLayer.removeChild(shipRouteLayer)
 }
 
 export function showInfoForRoute(opt) {
-    removeRouteInfo()
-    showRoute(opt.ship, opt.city)
+    removeRoute()
+    drawRoute(opt.ship, opt.city)
 
     if(infoMenu)stage.removeChild(infoMenu)
     infoMenu = g.showInfo([
@@ -85,13 +85,13 @@ export function showInfoForRoute(opt) {
     navigationLayer.addChild(infoMenu)
 }
 
-export function showRoute(currentShip, city){
+export function drawRoute(currentShip, city){
     let pathGraphics = new PIXI.Graphics();
     shipRouteLayer = new PIXI.Container();
     let path = easystar.findPath(currentShip.position.x, currentShip.position.y, city.cell.x, city.cell.y)
     for (let cell of path) {
-        g.drawTileRaw(pathGraphics, 0xFF5896, cellSize, cell.x * cellSize, cell.y * cellSize)
+        g.drawTileRaw(pathGraphics, 0xFF5896, cellSize / 2, cell.x * cellSize, cell.y * cellSize)
     }
     shipRouteLayer.addChild(pathGraphics)
-    navigationLayer.addChild(shipRouteLayer)
+    stage.addChild(shipRouteLayer)
 }

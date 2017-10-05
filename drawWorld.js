@@ -12,7 +12,7 @@ import * as sound from './sounds.js'
 
 import * as state from './state.js'
 
-import {openCityMenu, cellSize, canvasWidth} from './main.js'
+import {openCityMenu, cellSize, canvasWidth, getPixelPos, setPixelPos} from './main.js'
 
 let shipLayer = null;
 let cityLayer = null;
@@ -32,8 +32,9 @@ function drawShips(world, stage){
             else state.menuState.showShipMenu = ship
 
         };
-        ship1.x = ship.position.x * cellSize
-        ship1.y = ship.position.y * cellSize
+        setPixelPos(ship.position, ship1)
+        // ship1.x = ship.position.x * cellSize
+        // ship1.y = ship.position.y * cellSize
         shipLayer.addChild(ship1);
     })
     stage.addChild(shipLayer);
