@@ -10,9 +10,7 @@ rules:
     - warn
   no-console: 0
 globals:
-     _: true
      EasyStar: true
-     noise: true
      faker: true
      Resurrect: true
      Vue: true

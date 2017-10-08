@@ -1,10 +1,10 @@
 
 import * as PIXI from 'pixi.js';
-import {Game, WorldMap, WorldCell, Ship, City,SupplyAndDemand, InfluenceArea, Player, minTemperatur, maxTemperatur} from "./classes.js"
+import {Game, WorldMap, WorldCell, Ship, City,SupplyAndDemand, InfluenceArea, Player, minTemperatur, maxTemperatur} from "./classes"
 
 import * as util from './util.js'
 import * as helper from './helper.js'
-import {cellTypes} from './types.js'
+import {cellTypes} from './types'
 
 import * as g from './graphics.js'
 
@@ -12,20 +12,20 @@ import * as sound from './sounds.js'
 
 import * as state from './state.js'
 
-import {openCityMenu, cellSize, canvasWidth, getPixelPos, setPixelPos} from './main.js'
+import {openCityMenu, cellSize, canvasWidth, getPixelPos, setPixelPos} from './main'
 
-let shipLayer = null;
-let cityLayer = null;
+let shipLayer: PIXI.Container = null;
+let cityLayer: PIXI.Container = null;
 
-function drawShips(world, stage){
+function drawShips(world: WorldMap, stage: PIXI.Container){
     if(shipLayer) stage.removeChild(shipLayer)
     shipLayer = new PIXI.Container();
     world.ships.forEach(ship => {
         var ship1texture = PIXI.loader.resources.shipmap.texture;
-        var ship1 = new PIXI.Sprite(ship1texture);
+        var ship1:any = new PIXI.Sprite(ship1texture); // @FixMe wrong definition click
         ship1.interactive = true;
         helper.setXY(ship1.anchor, 0.5, 0.2);
-        ship1.click = (mouseData) =>  {
+        ship1.click = (mouseData:any) =>  {
             // openShipMenu(ship)
 
             if (state.menuState.showShipMenu == ship) delete state.menuState.showShipMenu
@@ -41,16 +41,16 @@ function drawShips(world, stage){
 
 }
 
-function drawCities(world, stage){
+function drawCities(world:WorldMap, stage:PIXI.Container){
     if(cityLayer) stage.removeChild(cityLayer)
     cityLayer = new PIXI.Container();
     world.cities.forEach(city => {
-        let house = g.drawHouse('0xBB3333', Math.round(cellSize*1.5))
+        let house:any = g.drawHouse('0xBB3333', Math.round(cellSize*1.5))
         house.x = city.cell.x * cellSize
         house.y = city.cell.y * cellSize
         helper.setXY(house.anchor, 0.5);
         house.interactive = true
-        house.click = (mouseData) => openCityMenu(city)
+        house.click = (mouseData:any) => openCityMenu(city)
         cityLayer.addChild(house);
 
         var textOptions = {
@@ -68,16 +68,16 @@ function drawCities(world, stage){
         if (text.x <= 40) text.anchor.x = .1
         if (text.x >= canvasWidth - 40) text.anchor.x = .9
         text.y = city.cell.y * cellSize - 15
-        text.canvas.style.webkitFontSmoothing = "antialiased";
+        // text.canvas.style.webkitFontSmoothing = "antialiased";
         cityLayer.addChild(text);
     })
     stage.addChild(cityLayer);
 
 }
 
-export function drawCanvas(renderer, world, layers, stage, cellSize){
+export function drawCanvas(renderer:any, world:WorldMap, layers:any, stage:PIXI.Container, cellSize:number){
     // PIXI.cocoontext.CONST.TEXT_RESOLUTION =  window.devicePixelRatio;
-    function drawWorldCells(world){
+    function drawWorldCells(world:WorldMap){
         let paddingPerSide = 0
         layers.container = new PIXI.Container();
         layers.temperatureView = new PIXI.Graphics();
@@ -133,23 +133,23 @@ export function drawCanvas(renderer, world, layers, stage, cellSize){
 
 }
 
-export function redrawCanvas(world, stage){
+export function redrawCanvas(world:WorldMap, stage:any){
     drawShips(world, stage)
     drawCities(world, stage)
     state.reassign()
 }
 
-function temperatureToColor(value){
+function temperatureToColor(value:number):string{
     let val = Math.round(util.scale(value,minTemperatur, maxTemperatur, -255, 0)) * -1
     let hex = val.toString(16)
     return '0xFF'+hex+hex
 }
-function elevationToColor(value){
+function elevationToColor(value:number):string{
     let val = util.scale(value,-1, 1, -255, 0)
     let hex = Math.round(val*-1).toString(16)
     return '0x'+hex+hex+hex
 }
-function rainfallToColor(value){
+function rainfallToColor(value:number):string{
     let val = Math.round(util.scale(value, -1 ,1 , -255, 0)) * -1
     let hex = val.toString(16)
     let color = '0x'+hex+hex+'FF'

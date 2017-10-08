@@ -1,5 +1,5 @@
 
-import {openCityMenu, openShipMenu, closeShipMenu, ressurect, bury} from './main.js'
+import {openCityMenu, openShipMenu, closeShipMenu, ressurect, bury} from './main.ts'
 
 import {startNavigation, endNavigation, showInfoForRoute, removeRoute} from './navigation.js'
 

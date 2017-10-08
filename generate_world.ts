@@ -1,15 +1,22 @@
 
 import {getDistance} from './util.js'
 
-import {City, Ship} from "./classes.js"
+import {City, WorldCell, WorldMap, Ship} from "./classes"
+import {noise} from "./perlin"
 
-function isWater(type){
+import * as _ from 'lodash';
+
+
+import * as faker from 'faker';
+import * as EasyStar from 'easystarjs';
+
+function isWater(type:string){
     return type == "ShallowWater" || type == "DeepWater" || type == "Water"
 }
 
 export const easystar = new EasyStar.js();
 
-export function setUpEasyStar(easystar, world) {
+export function setUpEasyStar(easystar:EasyStar.js, world: WorldMap) {
 
     var grid = new Array(world.height);
     for (let y = 0; y < world.height; y++) {
@@ -25,8 +32,8 @@ export function setUpEasyStar(easystar, world) {
 
 }
 
-export function generateWorld(opt){
-    let world = opt.world
+export function generateWorld(opt: any){
+    let world: WorldMap = opt.world
     let seaLevel = opt.seaLevel
     // noise.seed(16);
     // noise.seed(Math.random());
@@ -46,7 +53,7 @@ export function generateWorld(opt){
     world.cells.forEach(cell => cell.classify(seaLevel))
     console.timeEnd("cells")
 
-    function inRange(num, range) {
+    function inRange(num:number, range:[number, number]) {
         return num >= range[0] && num <= range[1]
     }
 
@@ -62,7 +69,7 @@ export function generateWorld(opt){
 
         console.log(shoreCells.length)
         for (var i = 0; i < 250; i++) {
-            let cell = _.sample(shoreCells)
+            let cell:WorldCell = _.sample(shoreCells)
             cell.isCity=true
             // shoreCells = shoreCells.filter(cell5 => getDistance(cell5, cell)>5)
             let minDistance = opt.canvasWidth * opt.canvasHeight  /100000
@@ -89,11 +96,13 @@ export function generateWorld(opt){
         let groupNum = 1
 
         while (cities.length >0) {
-            let start = cities.pop()
-            let group = []
+            let start:WorldCell = cities.pop()
+            let group:WorldCell[] = []
             groups.push(group)
             group.push(start)
-            var addGroup = _.remove(cities, city => easystar.findPath(start.x, start.y, city.x, city.y));
+            var addGroup = _.remove(cities, (city: WorldCell) => {
+                return easystar.findPath(start.x, start.y, city.x, city.y)
+            });
             Array.prototype.push.apply(group, addGroup)
         }
         let newCities = _.maxBy(groups, 'length');
@@ -105,8 +114,8 @@ export function generateWorld(opt){
     }
     let maxCities = opt.canvasWidth * opt.canvasHeight / 50000
     function limitNumCities(){
-        while (world.cells.filter(cell => cell.isCity).length > maxCities) {
-            _.sample(world.cells.filter(cell => cell.isCity)).isCity = false
+        while (world.cells.filter((cell: WorldCell) => cell.isCity).length > maxCities) {
+            _.sample(world.cells.filter((cell: WorldCell) => cell.isCity)).isCity = false
         }
     }
 

@@ -2,7 +2,6 @@
   "name": "1896",
   "version": "1.0.0",
   "description": "wirtschaftssimulation",
-  "main": "main.js",
   "scripts": {
     "dev": "webpack-dev-server --host 0.0.0.0 --disable-host-check --inline --hotOnly --env.dev",
     "build": "rimraf dist && webpack -p --progress --hide-modules",
@@ -19,6 +18,13 @@
   },
   "homepage": "https://github.com/PSeitz/1896#readme",
   "dependencies": {
+    "@types/faker": "^4.1.1",
+    "@types/lodash": "^4.14.77",
+    "@types/pixi.js": "^4.5.6",
+    "@types/webpack-env": "^1.13.1",
+    "easystarjs": "git+https://github.com/PSeitz/easystarjs.git",
+    "faker": "^4.1.0",
+    "lodash": "^4.17.4",
     "pixi-particles": "^2.1.6",
     "pixi.js": "^4.5.6",
     "resurrect.js": "^1.0.3"

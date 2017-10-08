@@ -1,8 +1,9 @@
 
-import {cellTypes} from './types.js'
+import {cellTypes, CellType} from './types'
 import {inRange,scale} from './util.js'
 
-import {cellSize, stage, renderer, easystar, world} from './main.js'
+import {cellSize, stage, renderer, easystar, world} from './main'
+import * as _ from 'lodash';
 
 let typesWithoutWater = Object.assign({}, cellTypes);
 delete typesWithoutWater.ShallowWater
@@ -11,11 +12,14 @@ delete typesWithoutWater.DeepWater
 delete typesWithoutWater.Mountain
 
 
-export let maxTemperatur = _.maxBy(_.values(cellTypes), el => (el.temperature ? el.temperature[1] : 0)).temperature[1];
-export let minTemperatur = _.minBy(_.values(cellTypes), el => (el.temperature ? el.temperature[0] : 0)).temperature[0];
+export let maxTemperatur = _.maxBy(_.values(cellTypes), (el: CellType) => (el.temperature ? el.temperature[1] : 0)).temperature[1];
+export let minTemperatur = _.minBy(_.values(cellTypes), (el: CellType) => (el.temperature ? el.temperature[0] : 0)).temperature[0];
 
 export class Game {
-    constructor(world) {
+    world: WorldMap
+    day: number
+    player: Player
+    constructor(world: WorldMap) {
         this.world = world;
         // this.cities = [];
         this.day = 0;
@@ -33,16 +37,28 @@ export class Game {
     }
 }
 
+
+export interface Position {
+    x: number;
+    y: number;
+}
+
 export class Player {
-    constructor(money, name) {
+    money: number
+    name: string 
+    constructor(money:number, name:string) {
         this.money = money;
         this.name = name;
     }
 }
 
-
 export class WorldCell {
-    constructor(x, y) {
+    x: number
+    y: number
+    data: any
+    type: string  // @FixMe enum
+    isCity: boolean
+    constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
         this.data = {}
@@ -66,7 +82,7 @@ export class WorldCell {
         // this.data.temperature = Math.minTemperatur(maxTemperatur, this.data.temperature)
         // this.data.temperature = Math.maxTemperatur(minTemperatur, this.data.temperature)
     }
-    classify(seaLevel){
+    classify(seaLevel:number){
         let data = this.data
         if (data.elevation < seaLevel) {
             if (data.elevation + 0.2 < seaLevel) {
@@ -79,7 +95,7 @@ export class WorldCell {
             this.type = "Mountain"
         }else{
 
-            let candidates = []
+            let candidates: string[] = []
             let self = this
             // function checkSet(){
             //     if(candidates.length === 1) self.type = candidates[0]
@@ -88,7 +104,7 @@ export class WorldCell {
             _.each(typesWithoutWater, function(type, key){
                 if(inRange(data.temperature, type.temperature)) candidates.push(key)//[key] = true
             })
-            function filter(prop){
+            let filter = (prop: string) => {
                 let cando = candidates.filter(cand => (typesWithoutWater[cand][prop] && !inRange(data[prop], typesWithoutWater[cand][prop])))
                 if (cando.length === 0 && candidates.length > 0) self.type = candidates[0]
                 candidates = cando
@@ -103,7 +119,13 @@ export class WorldCell {
 }
 
 export class WorldMap {
-    constructor(width, height, seaLevel) {
+    cities: City[] 
+    ships: Ship[] 
+    width: number
+    height: number
+    seaLevel: number
+    cells: WorldCell[] 
+    constructor(width:number, height:number, seaLevel:number) {
         this.cities = [];
         this.ships = [];
         this.width = width
@@ -112,7 +134,7 @@ export class WorldMap {
         this.cells = []
         this.createCells(width, height)
     }
-    createCells(width, height){
+    createCells(width:number, height:number){
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
                 let cell = new WorldCell(x,y);
@@ -123,8 +145,8 @@ export class WorldMap {
     draw(){
 
     }
-    getNeighborsWithCell(cell, radius){return this.getNeighbors(cell.x, cell.y, radius)}
-    getNeighbors(x,y, radius){
+    getNeighborsWithCell(cell: WorldCell, radius?:number){return this.getNeighbors(cell.x, cell.y, radius)}
+    getNeighbors(x:number,y:number, radius?:number){
         radius = radius || 1
         let neighbors = []
         for (let rowNum=Math.max(x-radius, 0); rowNum<=Math.min(x+radius, this.width-1); rowNum++) {
@@ -136,7 +158,7 @@ export class WorldMap {
         }
         return neighbors
     }
-    getCellAtXY(x,y){
+    getCellAtXY(x:number,y:number){
         for (let i = 0; i < this.cells.length; i++) {
             let cell = this.cells[i];
             if(cell.x === x && cell.y === y){
@@ -150,17 +172,18 @@ export class WorldMap {
 
 
 export class SupplyAndDemand {
-    constructor(producingGoods, neededGoods, population) {
+    constructor(producingGoods:any, neededGoods:any, population:number) {
         // this.supply = supply;
         // this.demand = demand;
     }
 }
 
 export class InfluenceArea{
-    constructor(cell, world) {
+    nearNeighbors: WorldCell[]
+    constructor(cell:WorldCell, world: WorldMap) {
         this.nearNeighbors = world.getNeighborsWithCell(cell, 3)
     }
-    getNeighborsWithTypes(types){
+    getNeighborsWithTypes(types: string[]){
         return this.nearNeighbors.filter(cell => types.indexOf(cell.type))
     }
     getWoodCells(){
@@ -169,9 +192,14 @@ export class InfluenceArea{
 }
 
 export class City {
-    constructor(name, cell, population, world) {
-        this.InfluenceArea = new InfluenceArea(cell, world)
-        this.supplyAndDemand = new SupplyAndDemand()
+    influenceArea: InfluenceArea
+    supplyAndDemand: SupplyAndDemand
+    name: string
+    cell: WorldCell
+    population: number
+    constructor(name:string, cell: WorldCell, population:number, world:WorldMap) {
+        this.influenceArea = new InfluenceArea(cell, world)
+        this.supplyAndDemand = new SupplyAndDemand(1, 2, 3)
         this.name = name;
         this.cell = cell;
         this.population = population;
@@ -190,15 +218,21 @@ export class City {
 
 
 export class Ship {
-    constructor(name, condition, capacity, position, owner, drivingTo) {
+    name: string
+    condition: number
+    capacity: number
+    position: Position
+    owner: string
+    drivingTo: City
+    currentPath: Position[]
+    constructor(name: string, condition:number, capacity:number, position: WorldCell, owner: string) {
         this.name = name;
         this.condition = condition;
         this.capacity = capacity;
         this.position = position
         this.owner = owner
-        this.drivingTo = drivingTo
     }
-    move(delta){
+    move(){
         if(!this.drivingTo) return
         if(!this.currentPath)
             this.currentPath = easystar.findPath(this.position.x, this.position.y, this.drivingTo.cell.x, this.drivingTo.cell.y)
