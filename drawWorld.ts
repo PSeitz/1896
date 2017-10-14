@@ -2,9 +2,9 @@
 import * as PIXI from 'pixi.js';
 import {Game, WorldMap, WorldCell, Ship, City,SupplyAndDemand, InfluenceArea, Player, minTemperatur, maxTemperatur} from "./classes"
 
-import * as util from './util.js'
-import * as helper from './helper.js'
-import {cellTypes} from './types'
+import * as util from './util'
+import * as helper from './helper'
+import {CellTypes} from './types'
 
 import * as g from './graphics.js'
 

@@ -40,7 +40,7 @@ import { generateWorld, setUpEasyStar } from "./generate_world"
 
 
 if (module.hot) {
-    module.hot.accept(['./graphics.js', './drawWorld.ts', './navigation.js', './test.js', './classes.ts', './generate_world.ts', './helper.js', './keyboard.js', './types.ts', './util.js', './state.js'], function() {
+    module.hot.accept(['./graphics.js', './drawWorld.ts', './navigation.js', './test.js', './classes.ts', './generate_world.ts', './helper.ts', './keyboard.js', './types.ts', './util.ts', './state.js'], function() {
         console.log('OOOH BOY')
         redrawCanvas(world, stage)
         // g.showInfo([])

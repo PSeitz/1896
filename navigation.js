@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 
 import {cellSize, stage, renderer, easystar, world} from './main.ts'
-import * as helper from './helper.js'
+import * as helper from './helper'
 import * as g from './graphics.js'
 import * as state from './state.js'
 

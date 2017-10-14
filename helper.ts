@@ -1,4 +1,7 @@
-export function setXY(target, value, y) {
+import {Position} from './classes'
+import * as _ from 'lodash';
+
+export function setXY(target:Position, value:number, y?:number) {
     target.x = value
     if (y) {
         target.y = y
@@ -6,12 +9,12 @@ export function setXY(target, value, y) {
         target.y = value
     }
 }
-export function setXYFrom(target, from) {
+export function setXYFrom(target:Position, from:Position) {
     target.x = from.x
     target.y = from.y
 }
 
-export function setWidthHeight(target, value, height) {
+export function setWidthHeight(target:any, value:number, height:number) {
     target.width = value
     if (height) {
         target.height = height
@@ -20,7 +23,7 @@ export function setWidthHeight(target, value, height) {
     }
 }
 
-export function getXYRatio(startPos, endPos){
+export function getXYRatio(startPos:Position, endPos:Position){
     let deltaX = (endPos.x - startPos.x)
     let deltaY = (endPos.y - startPos.y)
 
@@ -32,7 +35,7 @@ export function getXYRatio(startPos, endPos){
     }
 }
 
-export function moveTowards(startPos, endPos, movementAmount){
+export function moveTowards(startPos:Position, endPos:Position, movementAmount:number){
     // let deltaX = (endPos.x - startPos.x)
     // let deltaY = (endPos.y - startPos.y)
     //
@@ -51,50 +54,25 @@ export function moveTowards(startPos, endPos, movementAmount){
 
 }
 
-export function moveTowardsAngle(startPos, radians, movementAmount){
+export function moveTowardsAngle(startPos:Position, radians:number, movementAmount:number){
     return {
         x : startPos.x - movementAmount * Math.cos(radians),
         y : startPos.y - movementAmount * Math.sin(radians)
     }
 }
 
-
-export function turnUntilNoCollision(startPos, cellBodies, shouldTurnRight, adjustedDegree, lookahead){
-
-    let projectedCollisionPoint = moveTowardsAngle(startPos, degreesToRadians(adjustedDegree), lookahead);
-    let stepSize = 3, steps = 0;
-    let maxSteps = 360 / stepSize;
-    let turnFun = shouldTurnRight ? turnRight : turnLeft;
-
-    while (Matter.Query.ray(cellBodies, startPos, projectedCollisionPoint, 3).length > 0 ) {
-        steps ++;
-        adjustedDegree = turnFun(adjustedDegree, stepSize);
-
-        projectedCollisionPoint = moveTowardsAngle(startPos, degreesToRadians(adjustedDegree), lookahead);
-        if (steps > maxSteps)
-            return false;
-    }
-
-    adjustedDegree = turnFun(adjustedDegree, stepSize);
-    return {
-        degree: adjustedDegree,
-        steps: steps
-    };
-}
-
-
-export function getDegree(startPos, endPos){
+export function getDegree(startPos:Position, endPos:Position){
     let x = startPos.x - endPos.x;
     let y = startPos.y - endPos.y;
     let radians = Math.atan2(y,x);
     return radians
 }
 
-export function normalizeDegree(degree){
+export function normalizeDegree(degree:number){
     if (degree < 0)return degree + 360
     return degree
 }
-export function turnTowards(degree, targetDegree, stepSize){
+export function turnTowards(degree:number, targetDegree:number, stepSize:number){
     degree = normalizeDegree(degree)
     targetDegree = normalizeDegree(targetDegree)
     if (targetDegree-degree > 0) {
@@ -106,7 +84,7 @@ export function turnTowards(degree, targetDegree, stepSize){
 }
 
 // 0 180   -180 -0
-export function turnRight(degree, amount){
+export function turnRight(degree:number, amount:number){
     degree += amount;
     if (degree > 180) {
         degree = -180 + degree % 180;
@@ -115,7 +93,7 @@ export function turnRight(degree, amount){
 }
 
 // 0 180   -180 -0
-export function turnLeft(degree, amount){
+export function turnLeft(degree:number, amount:number){
     degree -= amount;
     if (degree < -180) {
         degree = 180 + degree % 180;
@@ -123,16 +101,16 @@ export function turnLeft(degree, amount){
     return degree;
 }
 
-export function radiansToDegrees(radians){
+export function radiansToDegrees(radians:number){
     return radians * (180/Math.PI)
 }
 
-export function degreesToRadians(degrees){
+export function degreesToRadians(degrees:number){
     return degrees / 180 * Math.PI
     // return degrees * Math.PI/180
 }
 
-export function randomXPointWithMinDistance(minDistance, otherXs, minX, maxX){
+export function randomXPointWithMinDistance(minDistance:number, otherXs:any, minX:number, maxX:number){
     let x, nearestNeighbour;
     for (let i = 0; i < 1000; i++) {
         x =  _.random(minX, maxX)
@@ -140,7 +118,7 @@ export function randomXPointWithMinDistance(minDistance, otherXs, minX, maxX){
             return x;
         }
 
-        for (otherX of otherXs) {
+        for (let otherX of otherXs) {
             let distance = Math.abs(otherX - x)
             if (nearestNeighbour == undefined || distance < nearestNeighbour) {
                 nearestNeighbour = distance
@@ -154,12 +132,12 @@ export function randomXPointWithMinDistance(minDistance, otherXs, minX, maxX){
     return x
 }
 
-export function pluck(array, property){
+export function pluck(array:any, property:string){
     let newArr = []
     let props = property.split('.')
-    for (el of array) {
+    for (let el of array) {
         let pluckedObj = el;
-        for (prop of props) {
+        for (let prop of props) {
             pluckedObj = pluckedObj[prop]
         }
         newArr.push(pluckedObj)

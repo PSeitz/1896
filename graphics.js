@@ -1,6 +1,6 @@
 
 import * as PIXI from 'pixi.js';
-import * as helper from './helper.js'
+import * as helper from './helper'
 
 
 export function addPlaneUI(thePlane){

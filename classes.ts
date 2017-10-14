@@ -1,6 +1,6 @@
 
-import {cellTypes, CellType} from './types'
-import {inRange,scale} from './util.js'
+import {CellTypes} from './types'
+import {inRange,scale} from './util'
 
 import {cellSize, stage, renderer, easystar, world} from './main'
 import * as _ from 'lodash';
@@ -45,7 +45,7 @@ export interface Position {
 
 export class Player {
     money: number
-    name: string 
+    name: string
     constructor(money:number, name:string) {
         this.money = money;
         this.name = name;
@@ -56,7 +56,7 @@ export class WorldCell {
     x: number
     y: number
     data: any
-    type: string  // @FixMe enum
+    type: CellTypes  // @FixMe enum
     isCity: boolean
     constructor(x: number, y: number) {
         this.x = x;
@@ -119,12 +119,12 @@ export class WorldCell {
 }
 
 export class WorldMap {
-    cities: City[] 
-    ships: Ship[] 
+    cities: City[]
+    ships: Ship[]
     width: number
     height: number
     seaLevel: number
-    cells: WorldCell[] 
+    cells: WorldCell[]
     constructor(width:number, height:number, seaLevel:number) {
         this.cities = [];
         this.ships = [];
@@ -235,7 +235,7 @@ export class Ship {
     move(){
         if(!this.drivingTo) return
         if(!this.currentPath)
-            this.currentPath = easystar.findPath(this.position.x, this.position.y, this.drivingTo.cell.x, this.drivingTo.cell.y)
+            this.currentPath = easystar.findPathSync(this.position.x, this.position.y, this.drivingTo.cell.x, this.drivingTo.cell.y)
         // if(this.currentPath == null) delete this.drivingTo
 
         this.currentPath.shift()

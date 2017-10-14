@@ -1,5 +1,5 @@
 
-import {getDistance} from './util.js'
+import {getDistance} from './util'
 
 import {City, WorldCell, WorldMap, Ship} from "./classes"
 import {noise} from "./perlin"
@@ -28,7 +28,6 @@ export function setUpEasyStar(easystar:EasyStar.js, world: WorldMap) {
     }
     easystar.setGrid(grid);
     easystar.setAcceptableTiles([0]);
-    easystar.enableSync();
 
 }
 
@@ -101,7 +100,7 @@ export function generateWorld(opt: any){
             groups.push(group)
             group.push(start)
             var addGroup = _.remove(cities, (city: WorldCell) => {
-                return easystar.findPath(start.x, start.y, city.x, city.y)
+                return easystar.findPathSync(start.x, start.y, city.x, city.y)
             });
             Array.prototype.push.apply(group, addGroup)
         }
