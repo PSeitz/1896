@@ -1,5 +1,5 @@
 
-import {CellTypes} from './types'
+import {CellKind, getCellTypeData, allCellKinds, allCellKindsNoWater} from './types'
 import {inRange,scale} from './util'
 
 import {cellSize, stage, renderer, easystar, world} from './main'
@@ -10,6 +10,17 @@ delete typesWithoutWater.ShallowWater
 delete typesWithoutWater.DeepWater
 // delete typesWithoutWater.Water
 delete typesWithoutWater.Mountain
+
+let typesWithoutWaters: CellKind[] = []
+for(let type in CellKind) {
+    let wat:CellKind = <keyof typeof CellKind>type;
+    if ([CellKind.Mountain, CellKind.ShallowWater, CellKind.DeepWater]) {
+        continue;
+    }
+    typesWithoutWaters.push(wat)
+    // if(typeof Color[n] === 'number') names.push(n);
+    // if(inRange(data.temperature, getCellTypeData(wat).temperature)) candidates.push(key)//[key] = true
+}
 
 
 export let maxTemperatur = _.maxBy(_.values(cellTypes), (el: CellType) => (el.temperature ? el.temperature[1] : 0)).temperature[1];
@@ -56,7 +67,7 @@ export class WorldCell {
     x: number
     y: number
     data: any
-    type: CellTypes  // @FixMe enum
+    type: CellKind
     isCity: boolean
     constructor(x: number, y: number) {
         this.x = x;
@@ -95,14 +106,21 @@ export class WorldCell {
             this.type = "Mountain"
         }else{
 
-            let candidates: string[] = []
+            let candidates: CellKind[] = []
             let self = this
             // function checkSet(){
             //     if(candidates.length === 1) self.type = candidates[0]
             // }
             // Check temperature
+
+            for(let type of allCellKindsNoWater) {
+
+                // if(typeof Color[n] === 'number') names.push(n);
+                if(inRange(data.temperature, getCellTypeData(type).temperature)) candidates.push(key)//[key] = true
+            }
+
             _.each(typesWithoutWater, function(type, key){
-                if(inRange(data.temperature, type.temperature)) candidates.push(key)//[key] = true
+                if(inRange(data.temperature, getCellTypeData(type).temperature)) candidates.push(key)//[key] = true
             })
             let filter = (prop: string) => {
                 let cando = candidates.filter(cand => (typesWithoutWater[cand][prop] && !inRange(data[prop], typesWithoutWater[cand][prop])))
