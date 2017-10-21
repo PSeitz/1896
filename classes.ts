@@ -1,26 +1,9 @@
 
-import {CellKind, getCellTypeData, allCellKinds, allCellKindsNoWater} from './types'
+import {cellTypes, CellType, cellTypesWithoutWater, CellKind, SeaLevelCellKind, OtherCellKind} from './types'
 import {inRange,scale} from './util'
 
 import {cellSize, stage, renderer, easystar, world} from './main'
 import * as _ from 'lodash';
-
-let typesWithoutWater = Object.assign({}, cellTypes);
-delete typesWithoutWater.ShallowWater
-delete typesWithoutWater.DeepWater
-// delete typesWithoutWater.Water
-delete typesWithoutWater.Mountain
-
-let typesWithoutWaters: CellKind[] = []
-for(let type in CellKind) {
-    let wat:CellKind = <keyof typeof CellKind>type;
-    if ([CellKind.Mountain, CellKind.ShallowWater, CellKind.DeepWater]) {
-        continue;
-    }
-    typesWithoutWaters.push(wat)
-    // if(typeof Color[n] === 'number') names.push(n);
-    // if(inRange(data.temperature, getCellTypeData(wat).temperature)) candidates.push(key)//[key] = true
-}
 
 
 export let maxTemperatur = _.maxBy(_.values(cellTypes), (el: CellType) => (el.temperature ? el.temperature[1] : 0)).temperature[1];
@@ -97,13 +80,13 @@ export class WorldCell {
         let data = this.data
         if (data.elevation < seaLevel) {
             if (data.elevation + 0.2 < seaLevel) {
-                this.type = "DeepWater"
+                this.type = SeaLevelCellKind.DeepWater
             }else{
-                this.type = "ShallowWater"
+                this.type = SeaLevelCellKind.ShallowWater
             }
 
         }else if (data.elevation > 0.85) {
-            this.type = "Mountain"
+            this.type = SeaLevelCellKind.Mountain
         }else{
 
             let candidates: CellKind[] = []
@@ -113,17 +96,18 @@ export class WorldCell {
             // }
             // Check temperature
 
-            for(let type of allCellKindsNoWater) {
-
+            for(let type in cellTypesWithoutWater) {
+                let typee = <CellKind>type;
                 // if(typeof Color[n] === 'number') names.push(n);
-                if(inRange(data.temperature, getCellTypeData(type).temperature)) candidates.push(key)//[key] = true
+                if(inRange(data.temperature, (typesWithoutWater[typee]).temperature)) candidates.push(typee)//[key] = true
             }
 
-            _.each(typesWithoutWater, function(type, key){
-                if(inRange(data.temperature, getCellTypeData(type).temperature)) candidates.push(key)//[key] = true
+            _.each(cellTypesWithoutWater, function(type, key){
+                let typee = <CellKind>key;
+                if(inRange(data.temperature, type.temperature)) candidates.push(typee)//[key] = true
             })
             let filter = (prop: string) => {
-                let cando = candidates.filter(cand => (typesWithoutWater[cand][prop] && !inRange(data[prop], typesWithoutWater[cand][prop])))
+                let cando = candidates.filter(cand => (cellTypesWithoutWater[cand][prop] && !inRange(data[prop], cellTypesWithoutWater[cand][prop])))
                 if (cando.length === 0 && candidates.length > 0) self.type = candidates[0]
                 candidates = cando
                 if(candidates.length === 1) self.type = candidates[0]

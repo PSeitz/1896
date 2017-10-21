@@ -1,3 +1,6 @@
+Start:
+    Geld leihen und Schiff kaufen
+
 Währung:
     Coins
 
@@ -19,6 +22,7 @@ Supply and Demand
     KI makes move and changes supply and demand
     Random events change supply and demand
     Depending on Sourrounding tiletypes
+    Jahreszeiten beinflussen die Preise, e.g. Getreide im Winter wertvoller?
 
 Random Event
     War
