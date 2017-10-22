@@ -77,15 +77,15 @@ export class WorldCell {
         // this.data.temperature = Math.maxTemperatur(minTemperatur, this.data.temperature)
     }
     classify(seaLevel:number){
-        let data = this.data
-        if (data.elevation < seaLevel) {
-            if (data.elevation + 0.2 < seaLevel) {
+        let currentCellData = this.data
+        if (currentCellData.elevation < seaLevel) {
+            if (currentCellData.elevation + 0.2 < seaLevel) {
                 this.type = SeaLevelCellKind.DeepWater
             }else{
                 this.type = SeaLevelCellKind.ShallowWater
             }
 
-        }else if (data.elevation > 0.85) {
+        }else if (currentCellData.elevation > 0.85) {
             this.type = SeaLevelCellKind.Mountain
         }else{
 
@@ -96,18 +96,18 @@ export class WorldCell {
             // }
             // Check temperature
 
-            for(let type in cellTypesWithoutWater) {
-                let typee = <CellKind>type;
-                // if(typeof Color[n] === 'number') names.push(n);
-                if(inRange(data.temperature, (typesWithoutWater[typee]).temperature)) candidates.push(typee)//[key] = true
-            }
+            // for(let type in cellTypesWithoutWater) {
+            //     let typee = <CellKind>type;
+            //     // if(typeof Color[n] === 'number') names.push(n);
+            //     if(inRange(currentCellData.temperature, (cellTypesWithoutWater[typee]).temperature)) candidates.push(typee)//[key] = true
+            // }
 
             _.each(cellTypesWithoutWater, function(type, key){
                 let typee = <CellKind>key;
-                if(inRange(data.temperature, type.temperature)) candidates.push(typee)//[key] = true
+                if(inRange(currentCellData.temperature, type.temperature)) candidates.push(typee)//[key] = true
             })
             let filter = (prop: string) => {
-                let cando = candidates.filter(cand => (cellTypesWithoutWater[cand][prop] && !inRange(data[prop], cellTypesWithoutWater[cand][prop])))
+                let cando = candidates.filter(cand => (cellTypesWithoutWater[cand][prop] && !inRange(currentCellData[prop], cellTypesWithoutWater[cand][prop])))
                 if (cando.length === 0 && candidates.length > 0) self.type = candidates[0]
                 candidates = cando
                 if(candidates.length === 1) self.type = candidates[0]

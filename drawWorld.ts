@@ -4,13 +4,13 @@ import {Game, WorldMap, WorldCell, Ship, City,SupplyAndDemand, InfluenceArea, Pl
 
 import * as util from './util'
 import * as helper from './helper'
-import {CellTypes} from './types'
+import { cellTypes} from './types'
 
 import * as g from './graphics.js'
 
 import * as sound from './sounds.js'
 
-import * as state from './state.js'
+import {state, bind} from './state'
 
 import {openCityMenu, cellSize, canvasWidth, getPixelPos, setPixelPos} from './main'
 
@@ -28,8 +28,8 @@ function drawShips(world: WorldMap, stage: PIXI.Container){
         ship1.click = (mouseData:any) =>  {
             // openShipMenu(ship)
 
-            if (state.menuState.showShipMenu == ship) delete state.menuState.showShipMenu
-            else state.menuState.showShipMenu = ship
+            if (state.showShipMenu == ship) delete state.showShipMenu
+            else state.showShipMenu = ship
 
         };
         setPixelPos(ship.position, ship1)

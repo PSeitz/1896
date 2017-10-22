@@ -33,14 +33,14 @@ import * as g from './graphics.js'
 
 import { drawCanvas, redrawCanvas } from './drawWorld'
 
-import * as state from './state.js'
+import {state, bind} from './state'
 
 
 import { generateWorld, setUpEasyStar } from "./generate_world"
-
+import  './navigation'
 
 if (module.hot) {
-    module.hot.accept(['./graphics.js', './drawWorld.ts', './navigation.js', './test.js', './classes.ts', './generate_world.ts', './helper.ts', './keyboard.js', './types.ts', './util.ts', './state.js'], function() {
+    module.hot.accept(['./graphics.js', './drawWorld.ts', './navigation.ts', './test.js', './classes.ts', './generate_world.ts', './helper.ts', './keyboard.js', './types.ts', './util.ts', './state.ts'], function() {
         console.log('OOOH BOY')
         redrawCanvas(world, stage)
         // g.showInfo([])
@@ -147,6 +147,10 @@ export function openCityMenu(city: City) {
 
 }
 
+bind("showShipMenu", (newVal:Ship)=> {
+    openShipMenu(newVal)
+})
+
 let shipMenu: PIXI.Container = null
 export function openShipMenu(ship:Ship) {
     sound.playRandom("pirate")
@@ -154,6 +158,9 @@ export function openShipMenu(ship:Ship) {
     let xPos = ship.position.x * cellSize + 20
     let yPos = ship.position.y * cellSize - 5
     if (shipMenu) closeShipMenu()
+    if (ship == null)
+        return
+        
     shipMenu = new PIXI.Container();
     shipMenu.x = xPos
     shipMenu.y = yPos
@@ -164,8 +171,8 @@ export function openShipMenu(ship:Ship) {
     let text:any = g.newText("Drive")
     text.interactive = true;
     text.click = (mouseData:any) => {
-        if (state.menuState.showShipNavigation == ship) delete state.menuState.showShipNavigation
-        else state.menuState.showShipNavigation = ship
+        if (state.showShipNavigation == ship) delete state.showShipNavigation
+        else state.showShipNavigation = ship
     };
     text.y = 5, text.x = 5
     shipMenu.addChild(text);
