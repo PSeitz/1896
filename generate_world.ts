@@ -8,15 +8,15 @@ import * as _ from 'lodash';
 
 
 import * as faker from 'faker';
-import * as EasyStar from 'easystarjs';
+import {EasyStar} from 'easystarjs';
 
 function isWater(type:string){
     return type == "ShallowWater" || type == "DeepWater" || type == "Water"
 }
 
-export const easystar = new EasyStar.js();
+export const easystar = new EasyStar();
 
-export function setUpEasyStar(easystar:EasyStar.js, world: WorldMap) {
+export function setUpEasyStar(easystar:EasyStar, world: WorldMap) {
 
     var grid = new Array(world.height);
     for (let y = 0; y < world.height; y++) {

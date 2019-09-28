@@ -4,13 +4,13 @@ import {Game, WorldMap, WorldCell, Ship, City,SupplyAndDemand, InfluenceArea, Pl
 
 import * as util from './util'
 import * as helper from './helper'
-import { cellTypes} from './types'
+import {CellTypes} from './types'
 
 import * as g from './graphics.js'
 
 import * as sound from './sounds.js'
 
-import {state, bind} from './state'
+import * as state from './state.js'
 
 import {openCityMenu, cellSize, canvasWidth, getPixelPos, setPixelPos} from './main'
 
@@ -28,8 +28,11 @@ function drawShips(world: WorldMap, stage: PIXI.Container){
         ship1.click = (mouseData:any) =>  {
             // openShipMenu(ship)
 
-            if (state.showShipMenu == ship) delete state.showShipMenu
-            else state.showShipMenu = ship
+            //TODO whatever
+            // if (state.menuState.showShipMenu == ship) 
+            //     delete state.menuState.showShipMenu
+            // else 
+            //     state.menuState.showShipMenu = ship
 
         };
         setPixelPos(ship.position, ship1)
@@ -88,7 +91,7 @@ export function drawCanvas(renderer:any, world:WorldMap, layers:any, stage:PIXI.
             var cell = world.cells[i];
             let x = paddingPerSide + cell.x * cellSize
             let y = paddingPerSide + cell.y * cellSize
-            let type = cellTypes[cell.type]
+            let type = CellTypes[cell.type]
             g.drawTileRaw(layers.worldView, type.color, cellSize, x, y)
             g.drawTileRaw(layers.temperatureView, temperatureToColor(cell.data.temperature), cellSize, x, y)
             g.drawTileRaw(layers.elevationView, elevationToColor(cell.data.elevation), cellSize, x, y)

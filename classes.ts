@@ -1,13 +1,13 @@
 
-import {cellTypes, CellType, cellTypesWithoutWater, CellKind, SeaLevelCellKind, OtherCellKind} from './types'
+import {CellTypes, CellType, cellTypesWithoutWater, CellKind, SeaLevelCellKind, OtherCellKind} from './types'
 import {inRange,scale} from './util'
 
 import {cellSize, stage, renderer, easystar, world} from './main'
 import * as _ from 'lodash';
 
 
-export let maxTemperatur = _.maxBy(_.values(cellTypes), (el: CellType) => (el.temperature ? el.temperature[1] : 0)).temperature[1];
-export let minTemperatur = _.minBy(_.values(cellTypes), (el: CellType) => (el.temperature ? el.temperature[0] : 0)).temperature[0];
+export let maxTemperatur = _.maxBy(_.values(CellTypes), (el: CellType) => (el.temperature ? el.temperature[1] : 0)).temperature[1];
+export let minTemperatur = _.minBy(_.values(CellTypes), (el: CellType) => (el.temperature ? el.temperature[0] : 0)).temperature[0];
 
 export class Game {
     world: WorldMap

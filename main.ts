@@ -8,7 +8,7 @@ export const cellSize = 10
 
 // const PIXI: any = require('pixi.js');
 import * as PIXI from 'pixi.js';
-import * as EasyStar from 'easystarjs';
+import {EasyStar} from 'easystarjs';
 import { Game, WorldMap, WorldCell,Position, Ship, City, SupplyAndDemand, InfluenceArea, Player, minTemperatur, maxTemperatur } from "./classes"
 
 import * as sound from './sounds.js'
@@ -87,7 +87,7 @@ if (localStorage['savegame1']) {
 
 export let world = game.world;
 
-export const easystar = new EasyStar.js();
+export const easystar = new EasyStar();
 setUpEasyStar(easystar, world)
 
 

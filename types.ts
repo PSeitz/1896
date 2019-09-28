@@ -38,7 +38,7 @@ export type CellTypeMapNoWater = {
     [P in OtherCellKind]: CellType;
 }
 
-export const cellTypes: CellTypeMap = {
+export const CellTypes: CellTypeMap = {
     Mountain: { color:0x101002, temperature:null},
     // "Water": { color:0x2A4F6E},
     ShallowWater: { color:0x165896, temperature:null},
@@ -77,7 +77,7 @@ export const cellTypes: CellTypeMap = {
 };
 
 
-export const cellTypesWithoutWater: CellTypeMapNoWater = Object.assign({}, cellTypes);
+export const cellTypesWithoutWater: CellTypeMapNoWater = Object.assign({}, CellTypes);
 delete cellTypesWithoutWater.ShallowWater
 delete cellTypesWithoutWater.DeepWater
 delete cellTypesWithoutWater.Mountain
