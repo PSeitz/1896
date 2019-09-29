@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 
 
 import * as faker from 'faker';
-import {EasyStar} from 'easystarjs';
+import {EasyStar} from 'easystarts';
 
 function isWater(type:string){
     return type == "ShallowWater" || type == "DeepWater" || type == "Water"

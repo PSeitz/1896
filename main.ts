@@ -8,7 +8,7 @@ export const cellSize = 10
 
 // const PIXI: any = require('pixi.js');
 import * as PIXI from 'pixi.js';
-import {EasyStar} from 'easystarjs';
+import {EasyStar} from 'easystarts';
 import { Game, WorldMap, WorldCell,Position, Ship, City, SupplyAndDemand, InfluenceArea, Player, minTemperatur, maxTemperatur } from "./classes"
 
 import * as sound from './sounds.js'
