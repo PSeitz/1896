@@ -5,8 +5,8 @@
     "module": "commonjs",
     "target": "es6",
     "esModuleInterop": true,
-    "allowJs": true,
     "moduleResolution": "node",
     "noImplicitAny":true
-  }
+  },
+  "include": ["*.ts"]
 }

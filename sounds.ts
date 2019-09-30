@@ -1,24 +1,26 @@
-var sounds = {};
+import _ from "lodash";
 
-export function load(name, path , opt){
-    let dat = opt || {}
+var sounds: {[key: string]: Howl} = {};
+
+export function load(name: string, path: string , opt?: { loop: boolean; volume: number; }){
+    let dat:any = opt || {}
     dat.src = [path]
     sounds[name] = new Howl(dat);
 }
 
-export function play(name){
+export function play(name: string){
     sounds[name].play();
 }
 
-export function stop(name){
+export function stop(name: string | number){
     sounds[name].stop();
 }
 
-export function get(name){
+export function get(name: string){
     return sounds[name]
 }
 
-export function playRandom(name){
+export function playRandom(name: string){
     let randSound = _.sample(Object.keys(sounds).filter(el => el.startsWith(name)))
     sounds[randSound].play();
 }

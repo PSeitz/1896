@@ -13,6 +13,11 @@ import { Game, WorldMap, WorldCell,Position, Ship, City, SupplyAndDemand, Influe
 
 import * as sound from './sounds.js'
 
+import * as g from './graphics.js'
+import { drawCanvas, redrawCanvas } from './drawWorld'
+import {state, bind} from './state'
+import { generateWorld, setUpEasyStar } from "./generate_world"
+// import  './navigation'
 
 (<any>window).Game = Game;
 (<any>window).WorldMap = WorldMap;
@@ -29,20 +34,12 @@ declare let Resurrect: any;
 declare let Vue: any;
 // declare function Resurrect(): Resurrect;
 
-import * as g from './graphics.js'
 
-import { drawCanvas, redrawCanvas } from './drawWorld'
-
-import {state, bind} from './state'
-
-
-import { generateWorld, setUpEasyStar } from "./generate_world"
-import  './navigation'
 
 if (module.hot) {
     module.hot.accept(['./graphics.js', './drawWorld.ts', './navigation.ts', './test.js', './classes.ts', './generate_world.ts', './helper.ts', './keyboard.js', './types.ts', './util.ts', './state.ts'], function() {
         console.log('OOOH BOY')
-        redrawCanvas(world, stage)
+        redrawCanvas(renderer, world, stage)
         // g.showInfo([])
     })
     module.hot.accept();
@@ -115,7 +112,7 @@ function setupMovie(baseString:string) {
 
 // export const stage = new PIXI.Container(0x66FF99, true);
 export const stage = new PIXI.Container();
-export let renderer:any;
+export let renderer:PIXI.Renderer;
 
 let menu: PIXI.Container = null
 
@@ -138,7 +135,7 @@ export function openCityMenu(city: City) {
     menu.y = yPos
 
     let graphics = new PIXI.Graphics();
-    g.drawCityMenu(graphics, menu)
+    g.drawCityMenu(renderer, graphics, menu)
 
     let movie:any = setupMovie('beer')
     movie.click = (mouseData:any) => alert("CLICK Beer");
@@ -166,9 +163,9 @@ export function openShipMenu(ship:Ship) {
     shipMenu.y = yPos
 
     let graphics = new PIXI.Graphics();
-    g.drawCityMenu(graphics, shipMenu)
+    g.drawCityMenu(renderer, graphics, shipMenu)
 
-    let text:any = g.newText("Drive")
+    let text:any = g.newText("Drive", 12)
     text.interactive = true;
     text.click = (mouseData:any) => {
         if (state.showShipNavigation == ship) delete state.showShipNavigation
@@ -215,7 +212,7 @@ function nextTurn() {
     for (let ship of world.ships) {
         ship.move()
     }
-    redrawCanvas(world, stage)
+    redrawCanvas(renderer, world, stage)
 }
 
 export function getPixelPos(opt:Position) { // @FixMe not any

@@ -44,11 +44,11 @@ function drawShips(world: WorldMap, stage: PIXI.Container){
 
 }
 
-function drawCities(world:WorldMap, stage:PIXI.Container){
+function drawCities(renderer: PIXI.Renderer, world:WorldMap, stage:PIXI.Container){
     if(cityLayer) stage.removeChild(cityLayer)
     cityLayer = new PIXI.Container();
     world.cities.forEach(city => {
-        let house:any = g.drawHouse('0xBB3333', Math.round(cellSize*1.5))
+        let house:any = g.drawHouse(renderer, parseInt('0xBB3333', 16), Math.round(cellSize*1.5))
         house.x = city.cell.x * cellSize
         house.y = city.cell.y * cellSize
         helper.setXY(house.anchor, 0.5);
@@ -78,7 +78,7 @@ function drawCities(world:WorldMap, stage:PIXI.Container){
 
 }
 
-export function drawCanvas(renderer:any, world:WorldMap, layers:any, stage:PIXI.Container, cellSize:number){
+export function drawCanvas(renderer:PIXI.Renderer, world:WorldMap, layers:any, stage:PIXI.Container, cellSize:number){
     // PIXI.cocoontext.CONST.TEXT_RESOLUTION =  window.devicePixelRatio;
     function drawWorldCells(world:WorldMap){
         let paddingPerSide = 0
@@ -96,7 +96,6 @@ export function drawCanvas(renderer:any, world:WorldMap, layers:any, stage:PIXI.
             g.drawTileRaw(layers.temperatureView, temperatureToColor(cell.data.temperature), cellSize, x, y)
             g.drawTileRaw(layers.elevationView, elevationToColor(cell.data.elevation), cellSize, x, y)
             g.drawTileRaw(layers.rainFallView, rainfallToColor(cell.data.rainfall), cellSize, x, y)
-
         }
         layers.container.addChild(layers.worldView);
         stage.addChild(layers.container);
@@ -122,7 +121,7 @@ export function drawCanvas(renderer:any, world:WorldMap, layers:any, stage:PIXI.
     }
 
     drawWorldCells(world)
-    drawCities(world, stage)
+    drawCities(renderer, world, stage)
     drawShips(world, stage)
     animate()
 
@@ -136,25 +135,45 @@ export function drawCanvas(renderer:any, world:WorldMap, layers:any, stage:PIXI.
 
 }
 
-export function redrawCanvas(world:WorldMap, stage:any){
+export function redrawCanvas(renderer: PIXI.Renderer, world:WorldMap, stage:any){
     drawShips(world, stage)
-    drawCities(world, stage)
+    drawCities(renderer, world, stage)
     state.reassign()
 }
 
-function temperatureToColor(value:number):string{
+// function temperatureToColor(value:number):string{
+//     let val = Math.round(util.scale(value,minTemperatur, maxTemperatur, -255, 0)) * -1
+//     let hex = val.toString(16)
+//     return '0xFF'+hex+hex
+// }
+// function elevationToColor(value:number):string{
+//     let val = util.scale(value,-1, 1, -255, 0)
+//     let hex = Math.round(val*-1).toString(16)
+//     return '0x'+hex+hex+hex
+// }
+// function rainfallToColor(value:number):string{
+//     let val = Math.round(util.scale(value, -1 ,1 , -255, 0)) * -1
+//     let hex = val.toString(16)
+//     let color = '0x'+hex+hex+'FF'
+//     return color
+// }
+
+function temperatureToColor(value:number):number{
     let val = Math.round(util.scale(value,minTemperatur, maxTemperatur, -255, 0)) * -1
     let hex = val.toString(16)
-    return '0xFF'+hex+hex
+    return parseInt('FF'+hex+hex, 16)
+    // return '0xFF'+hex+hex
 }
-function elevationToColor(value:number):string{
+function elevationToColor(value:number):number{
     let val = util.scale(value,-1, 1, -255, 0)
     let hex = Math.round(val*-1).toString(16)
-    return '0x'+hex+hex+hex
+    // return '0x'+hex+hex+hex
+    return parseInt('FF'+hex+hex+hex, 16)
 }
-function rainfallToColor(value:number):string{
+function rainfallToColor(value:number):number{
     let val = Math.round(util.scale(value, -1 ,1 , -255, 0)) * -1
     let hex = val.toString(16)
     let color = '0x'+hex+hex+'FF'
-    return color
+    // return color
+    return parseInt(hex+hex+'FF', 16)
 }

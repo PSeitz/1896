@@ -1,12 +1,9 @@
 import * as PIXI from 'pixi.js';
-
 import {cellSize, stage, renderer, easystar, world} from './main'
 import * as helper from './helper'
 import * as g from './graphics.js'
 import {state, bind} from './state'
-
 import * as sound from './sounds.js'
-
 import {City, Ship} from './classes'
 
 let navigationLayer: PIXI.Container = null
@@ -22,17 +19,17 @@ export function endNavigation(){
     infoMenu= null
 }
 
-function drawDashedBorder(step:number){
+function drawDashedBorder(renderer: PIXI.Renderer, step:number){
     let cont = new PIXI.Container();
-    cont.addChild(g.drawdash(0,0,step,0,3));
-    cont.addChild(g.drawdash(0,0,0,step,3));
-    cont.addChild(g.drawdash(step,0,step,step,3));
-    cont.addChild(g.drawdash(0,step,step,step,3));
+    cont.addChild(g.drawdash(renderer,0,0,step,0,3));
+    cont.addChild(g.drawdash(renderer,0,0,0,step,3));
+    cont.addChild(g.drawdash(renderer,step,0,step,step,3));
+    cont.addChild(g.drawdash(renderer,0,step,step,step,3));
     return cont
 }
 
 bind("showShipNavigation", (newVal:Ship)=> {
-    navigationForShip(newVal)
+    // navigationForShip(newVal) //TODO RENDERER IRGNEDWOHER
 })
 
 bind("showRouteInfo", (newVal:({city:City, ship: Ship}))=> {
@@ -40,14 +37,14 @@ bind("showRouteInfo", (newVal:({city:City, ship: Ship}))=> {
 })
 
 
-export function navigationForShip(ship:Ship) {
+export function navigationForShip(renderer: PIXI.Renderer, ship:Ship) {
     endNavigation();
     if (ship ==null) return
 
     navigationLayer = new PIXI.Container();
     let step = cellSize*2.5
-    let cont = drawDashedBorder(step)
-    let texture = renderer.generateTexture(cont);
+    let cont = drawDashedBorder(renderer, step)
+    let texture = renderer.generateTexture(cont, PIXI.SCALE_MODES.LINEAR, 1);
 
     world.cities.forEach((city:City) => {
         let x = city.cell.x * cellSize
