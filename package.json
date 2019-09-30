@@ -19,14 +19,13 @@
   "homepage": "https://github.com/PSeitz/1896#readme",
   "dependencies": {
     "@types/faker": "^4.1.1",
+    "@types/heap": "^0.2.28",
     "@types/lodash": "^4.14.77",
-    "@types/pixi.js": "^4.8.8",
     "@types/webpack-env": "^1.13.1",
     "easystarts": "git+https://github.com/PSeitz/easystarts.git",
     "faker": "^4.1.0",
     "lodash": "^4.17.4",
-    "pixi-particles": "^2.1.9",
-    "pixi.js": "^4.8.8",
+    "pixi.js": "^5.1.5",
     "resurrect.js": "^1.0.3"
   },
   "devDependencies": {

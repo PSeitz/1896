@@ -106,7 +106,7 @@ function setupMovie(baseString:string) {
     for (var i = 0; i < Object.keys(textures).length; i++) {
         frames.push(textures[baseString + i + '.png']);
     }
-    var movie = new PIXI.extras.AnimatedSprite(frames);
+    var movie = new PIXI.AnimatedSprite(frames);
     movie.interactive = true
     movie.animationSpeed = 0.13
     movie.play();
@@ -190,10 +190,12 @@ function start() {
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
-    renderer = PIXI.autoDetectRenderer(canvasWidth, canvasHeight, {
+    renderer = PIXI.autoDetectRenderer({
+        width:canvasWidth,
+        height: canvasHeight,
         view: canvas, backgroundColor: 0x1099bb, antialias: true,
         resolution: window.devicePixelRatio || 1,
-        autoResize: true
+        // autoResize: true
     });
 
     drawCanvas(renderer, world, layers, stage, cellSize)
