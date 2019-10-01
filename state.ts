@@ -62,7 +62,7 @@ function reassignKey(key:keys){
 
 }
 
-export function bind(name:keys, handler:(newValue:{} | null) => any) {
+export function bind(name:keys, handler:(newValue:any | null) => any) {
     handlers[name] = handler;
 }
 

@@ -6,9 +6,9 @@ import {state, bind} from './state'
 import * as sound from './sounds.js'
 import {City, Ship} from './classes'
 
-let navigationLayer: PIXI.Container = null
-let shipRouteLayer: PIXI.Container = null
-let infoMenu: PIXI.Container = null
+let navigationLayer: PIXI.Container | null = null
+let shipRouteLayer: PIXI.Container | null = null
+let infoMenu: PIXI.Container | null = null
 
 export function endNavigation(){
     if(navigationLayer) stage.removeChild(navigationLayer)
@@ -61,14 +61,14 @@ export function navigationForShip(renderer: PIXI.Renderer, ship:Ship) {
             if (state.showRouteInfo && state.showRouteInfo.city == city) delete state.showRouteInfo
             else state.showRouteInfo = {city:city, ship: state.showShipNavigation}
         }
-        navigationLayer.addChild(sprite1)
+        navigationLayer!.addChild(sprite1)
     })
 
     stage.addChild(navigationLayer)
 }
 
 export function removeRoute(){
-    navigationLayer.removeChild(shipRouteLayer)
+    navigationLayer && shipRouteLayer && navigationLayer.removeChild(shipRouteLayer)
 }
 
 export function showInfoForRoute(opt:({city:City, ship: Ship})) {
@@ -76,7 +76,7 @@ export function showInfoForRoute(opt:({city:City, ship: Ship})) {
     if (opt==null) return;
     drawRoute(opt.ship, opt.city)
 
-    if(infoMenu)navigationLayer.removeChild(infoMenu)
+    if(infoMenu && navigationLayer)navigationLayer.removeChild(infoMenu)
     infoMenu = g.showInfo([
         {text:"Und ab gehts", onclick: ()=>{
             // alert("ja")
@@ -90,16 +90,18 @@ export function showInfoForRoute(opt:({city:City, ship: Ship})) {
             alert("mäh")
         }}]
     )
-    navigationLayer.addChild(infoMenu)
+    navigationLayer!.addChild(infoMenu)
 }
 
 export function drawRoute(currentShip:Ship, city:City){
     let pathGraphics = new PIXI.Graphics();
     shipRouteLayer = new PIXI.Container();
     let path = easystar.findPathSync(currentShip.position.x, currentShip.position.y, city.cell.x, city.cell.y)
-    for (let cell of path) {
-        g.drawTileRaw(pathGraphics, 0xFF5896, cellSize / 2, cell.x * cellSize, cell.y * cellSize)
+    if (path){
+        for (let cell of path) {
+            g.drawTileRaw(pathGraphics, 0xFF5896, cellSize / 2, cell.x * cellSize, cell.y * cellSize)
+        }
     }
     shipRouteLayer.addChild(pathGraphics)
-    navigationLayer.addChild(shipRouteLayer)
+    navigationLayer!.addChild(shipRouteLayer)
 }

@@ -98,7 +98,7 @@ let layers = {}
 function setupMovie(baseString:string) {
 
     var frames = [];
-    let textures = PIXI.loader.resources[baseString].textures
+    let textures = PIXI.loader.resources[baseString].textures!
     if (!textures) alert(baseString + " animation not found")
     for (var i = 0; i < Object.keys(textures).length; i++) {
         frames.push(textures[baseString + i + '.png']);
@@ -114,10 +114,10 @@ function setupMovie(baseString:string) {
 export const stage = new PIXI.Container();
 export let renderer:PIXI.Renderer;
 
-let menu: PIXI.Container = null
+let menu: PIXI.Container | null = null
 
 function closeCityMenu(city:any) {
-    stage.removeChild(menu)
+    menu && stage.removeChild(menu)
 }
 
 export function openCityMenu(city: City) {
@@ -148,7 +148,7 @@ bind("showShipMenu", (newVal:Ship)=> {
     openShipMenu(newVal)
 })
 
-let shipMenu: PIXI.Container = null
+let shipMenu: PIXI.Container | null = null
 export function openShipMenu(ship:Ship) {
     sound.playRandom("pirate")
     sound.play("ship.pirate.bay")
